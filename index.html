@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>DALY.BIZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:'DM Serif Display','Georgia',serif;
+  background:#b89a60}
+
+/* utility — sans for labels, stats, tags, nav */
+.sans{font-family:'DM Sans',system-ui,sans-serif}
+
+#fc{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+
+/* ── HORIZONTAL SNAP SCROLL ── */
+#app{
+  position:relative;z-index:1;
+  display:flex;width:100%;height:100vh;
+  overflow-x:scroll;overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+#app::-webkit-scrollbar{display:none}
+
+.panel{
+  min-width:100vw;height:100vh;
+  scroll-snap-align:start;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:4.5rem 2rem 3.5rem;
+}
+
+/* ── CONTENT BOX ── */
+.box{
+  width:100%;max-width:860px;
+  background:rgba(255,252,245,.86);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:3px;
+  box-shadow:0 8px 48px rgba(80,50,10,.12);
+  overflow-y:auto;
+  max-height:calc(100vh - 8rem);
+  scrollbar-width:thin;
+  scrollbar-color:rgba(26,14,0,.15) transparent;
+}
+.box::-webkit-scrollbar{width:3px}
+.box::-webkit-scrollbar-thumb{background:rgba(26,14,0,.15)}
+.inner{padding:3rem 3.5rem}
+
+/* ── MOBILE ── */
+@media(max-width:600px){
+  .panel{padding:3.8rem .75rem 3rem}
+  .box{max-height:calc(100vh - 7rem);width:calc(100vw - 1.5rem)}
+  .inner{padding:1.6rem 1.4rem}
+  .htitle{font-size:clamp(2.4rem,13vw,3.8rem)!important;white-space:nowrap}
+  .hbody{max-width:100%!important;font-size:.92rem}
+  .stat-col{flex-direction:row!important;width:100%!important;max-width:100%!important}
+  .stat-col .si{flex:1;padding:.9rem .5rem!important;min-width:0!important}
+  .stat-col .sn{font-size:1.3rem!important}
+  .stat-col .sl{font-size:.52rem!important;letter-spacing:.08em!important}
+  .ttl{font-size:clamp(1.4rem,6vw,2rem)!important}
+  .steps{grid-template-columns:1fr!important}
+  .otg-grid{grid-template-columns:1fr!important}
+  .contact-grid{grid-template-columns:1fr!important}
+  .frow{grid-template-columns:1fr!important}
+  .trait-stack,.stack{max-width:100%!important}
+  nav{padding:.75rem 1rem}
+  .nav-r a{display:none!important}
+  .dots{gap:.35rem;padding:.35rem .6rem}
+  .dot{width:6px;height:6px}
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  padding:.85rem 2rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.logo{
+  font-family:'DM Sans',sans-serif;
+  font-size:1rem;font-weight:700;letter-spacing:.14em;
+  color:rgba(40,22,0,.85);cursor:pointer;white-space:nowrap;
+}
+.nav-r{display:flex;gap:.3rem;align-items:center}
+.nav-r a{
+  font-family:'DM Sans',sans-serif;
+  font-size:.7rem;font-weight:500;letter-spacing:.07em;
+  color:rgba(40,22,0,.62);
+  text-decoration:none;padding:.3rem .65rem;cursor:pointer;transition:color .2s;
+  display:none;white-space:nowrap;
+}
+.nav-r a:hover{color:rgba(40,22,0,.95)}
+@media(min-width:640px){.nav-r a{display:inline}}
+.nav-cta{
+  font-family:'DM Sans',sans-serif;
+  font-size:.72rem;font-weight:600;letter-spacing:.08em;
+  color:rgba(40,22,0,.85);
+  border:1px solid rgba(40,22,0,.3);padding:.34rem .9rem;
+  text-decoration:none;cursor:pointer;transition:all .2s;
+  background:rgba(255,248,230,.55);white-space:nowrap;
+}
+.nav-cta:hover{background:rgba(40,22,0,.12)}
+
+/* ── DOTS ── */
+.dots{
+  position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);
+  z-index:50;display:flex;gap:.45rem;
+  background:rgba(200,170,100,.45);
+  padding:.38rem .7rem;border-radius:20px;
+  border:1px solid rgba(255,255,255,.3);
+}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(40,22,0,.22);border:none;cursor:pointer;transition:all .25s}
+.dot.on{background:rgba(40,22,0,.75);transform:scale(1.35)}
+
+#pbar{position:fixed;bottom:0;left:0;height:2px;background:rgba(40,22,0,.4);z-index:60;pointer-events:none}
+
+/* ── SHARED TEXT ── */
+.lbl{font-size:.66rem;letter-spacing:.26em;color:rgba(40,22,0,.45);text-transform:uppercase;margin-bottom:.6rem}
+.ttl{font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:700;line-height:1.2;color:#1a0e00}
+.ttl em{font-style:normal;color:#5a3800}
+.rule{width:36px;height:2px;background:rgba(40,22,0,.2);margin:.9rem 0 1.3rem}
+.bd{font-size:clamp(.88rem,2vw,.96rem);line-height:1.85;color:rgba(40,22,0,.68);margin-bottom:.85rem}
+
+/* ── BLOCKS ── */
+.blk{
+  padding:1.2rem 1.5rem;
+  background:rgba(255,248,230,.6);
+  border:1px solid rgba(40,22,0,.1);
+  border-bottom:none;transition:background .2s;
+}
+.blk:last-child{border-bottom:1px solid rgba(40,22,0,.1)}
+.blk:hover{background:rgba(255,252,242,.9)}
+.bn{font-size:.58rem;letter-spacing:.2em;color:rgba(40,22,0,.32);text-transform:uppercase;margin-bottom:.3rem;font-family:monospace}
+.bt{font-size:.96rem;font-weight:700;color:#1a0e00;margin-bottom:.28rem}
+.bb{font-size:.82rem;line-height:1.58;color:rgba(40,22,0,.62)}
+.btag{display:inline-block;font-family:monospace;font-size:.56rem;letter-spacing:.08em;padding:.1rem .42rem;margin-top:.4rem;border:1px solid rgba(40,22,0,.18);color:rgba(40,22,0,.5)}
+
+/* ── BTNS ── */
+.btn{display:inline-block;cursor:pointer;background:rgba(40,22,0,.78);color:#f5e8d0;padding:.78rem 2rem;font-size:.78rem;letter-spacing:.1em;text-decoration:none;border:none;font-family:'Georgia',serif;transition:background .2s}
+.btn:hover{background:#1a0e00}
+.btn-o{display:inline-block;cursor:pointer;background:rgba(255,248,230,.5);color:#1a0e00;padding:.72rem 1.7rem;font-size:.76rem;letter-spacing:.1em;text-decoration:none;border:1px solid rgba(40,22,0,.3);transition:all .2s}
+.btn-o:hover{background:rgba(40,22,0,.1)}
+
+/* ── HERO ── */
+.hero-grid{display:grid;grid-template-columns:1fr auto;gap:2.5rem;align-items:center}
+@media(max-width:520px){.hero-grid{grid-template-columns:1fr}}
+.htitle{font-size:clamp(2.8rem,8vw,5.5rem);font-weight:700;line-height:1;letter-spacing:-.02em;color:#1a0e00;margin-bottom:1.2rem;white-space:nowrap}
+.htitle .dot-biz{color:rgba(40,22,0,.45)}
+.eyebrow{font-size:.66rem;letter-spacing:.26em;color:rgba(40,22,0,.45);text-transform:uppercase;margin-bottom:.9rem}
+.hbody{font-size:clamp(.86rem,2vw,.95rem);line-height:1.78;color:rgba(40,22,0,.66);max-width:380px;margin-bottom:1.7rem}
+.stat-col{display:flex;flex-direction:column;gap:1px;background:rgba(40,22,0,.1)}
+.si{background:rgba(255,248,230,.7);padding:1.1rem 1.5rem;min-width:110px;text-align:center}
+.sn{font-size:1.6rem;font-weight:700;color:#1a0e00}
+.sl{font-size:.58rem;letter-spacing:.12em;color:rgba(40,22,0,.42);margin-top:.1rem;text-transform:uppercase}
+
+/* ── TRAITS / SVC STACK ── */
+.stack{display:flex;flex-direction:column;max-width:640px;margin-top:.8rem}
+
+/* ── PROCESS ── */
+.steps{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(40,22,0,.1);border:1px solid rgba(40,22,0,.1);margin-top:1.8rem}
+.step{padding:1.8rem 1.6rem;background:rgba(255,248,230,.6);transition:background .2s}
+.step:hover{background:rgba(255,252,242,.9)}
+.sn2{font-size:2rem;font-weight:700;color:rgba(40,22,0,.15);line-height:1;margin-bottom:.9rem}
+.step h3{font-size:.95rem;font-weight:700;margin-bottom:.45rem;color:#1a0e00}
+.step p{font-size:.8rem;line-height:1.68;color:rgba(40,22,0,.6)}
+
+/* ── OTG ── */
+.otg-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+@media(max-width:560px){.otg-grid{grid-template-columns:1fr}}
+.pt h4{font-size:.6rem;letter-spacing:.2em;color:rgba(40,22,0,.38);margin-bottom:1.1rem;text-transform:uppercase}
+.ptr{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid rgba(40,22,0,.08);font-size:.85rem}
+.ptr:last-child{border-bottom:none}
+.ptr span:first-child{color:rgba(40,22,0,.62)}
+.pts{font-family:monospace;font-size:.62rem;letter-spacing:.08em;color:#2a6e1a}
+.pulse{width:6px;height:6px;background:#2a9e1a;border-radius:50%;display:inline-block;margin-right:.4rem;animation:glow 2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(42,158,26,.5)}50%{box-shadow:0 0 0 5px rgba(42,158,26,0)}}
+
+/* ── SKILLS ── */
+.pills{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:1.4rem}
+.pill{background:rgba(255,248,230,.7);border:1px solid rgba(40,22,0,.15);padding:.34rem .85rem;font-size:.76rem;color:rgba(40,22,0,.62);letter-spacing:.04em;transition:all .2s;cursor:default}
+.pill:hover{background:rgba(255,252,242,.95);color:#1a0e00}
+
+/* ── CONTACT ── */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+@media(max-width:560px){.contact-grid{grid-template-columns:1fr}}
+.cf{display:flex;flex-direction:column;gap:.65rem}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.cf input,.cf select,.cf textarea{
+  width:100%;background:rgba(255,252,242,.85);
+  border:1px solid rgba(40,22,0,.2);
+  padding:.72rem .9rem;font-size:.86rem;
+  font-family:'Georgia',serif;color:#1a0e00;
+  outline:none;transition:border-color .2s;-webkit-appearance:none;
+}
+.cf *::placeholder{color:rgba(40,22,0,.3)}
+.cf *:focus{border-color:rgba(40,22,0,.55)}
+.cf textarea{min-height:88px;resize:vertical}
+.cf select option{background:#f5e8d0}
+.subbtn{background:rgba(40,22,0,.78);color:#f5e8d0;border:none;padding:.84rem;font-family:'Georgia',serif;font-size:.82rem;letter-spacing:.1em;cursor:pointer;transition:background .2s;width:100%}
+.subbtn:hover{background:#1a0e00}
+.extl{display:block;margin-top:1.6rem;font-size:.72rem;letter-spacing:.1em;color:rgba(40,22,0,.48);text-decoration:none;border-bottom:1px solid rgba(40,22,0,.15);padding-bottom:.32rem;transition:color .2s;max-width:280px}
+.extl:hover{color:#1a0e00}
+</style>
+</head>
+<body>
+
+<canvas id="fc"></canvas>
+<div id="pbar"></div>
+
+<nav>
+  <div class="logo" onclick="goTo(0)">DALY.BIZ</div>
+  <div class="nav-r">
+    <a onclick="goTo(1)">About</a>
+    <a onclick="goTo(3)">Services</a>
+    <a onclick="goTo(5)">Process</a>
+    <a onclick="goTo(6)">OTG</a>
+    <a onclick="goTo(7)">Skills</a>
+    <a class="nav-cta" onclick="goTo(8)">Get Started</a>
+  </div>
+</nav>
+
+<div class="dots" id="dots"></div>
+
+<div id="app">
+
+  <!-- P0 HERO -->
+  <div class="panel" id="p0">
+    <div class="box"><div class="inner">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+        <p class="eyebrow">// Digital Consulting LLC</p>
+        <h1 class="htitle">DALY<span class="dot-biz">.BIZ</span></h1>
+        <p class="hbody" style="max-width:420px;margin-left:auto;margin-right:auto">Discord ecosystems, Whop academies, executive ops, and creative production — built for founders, traders, and operators who move fast.</p>
+        <a class="btn" onclick="goTo(3)" style="margin-bottom:2rem">Explore Services →</a>
+        <div class="stat-col" style="flex-direction:row;width:100%;max-width:480px">
+          <div class="si" style="flex:1"><div class="sn">9+</div><div class="sl">Services</div></div>
+          <div style="width:1px;background:rgba(40,22,0,.1)"></div>
+          <div class="si" style="flex:1"><div class="sn">24H</div><div class="sl">Response</div></div>
+          <div style="width:1px;background:rgba(40,22,0,.1)"></div>
+          <div class="si" style="flex:1"><div class="sn">OTG</div><div class="sl">Partner</div></div>
+          <div style="width:1px;background:rgba(40,22,0,.1)"></div>
+          <div class="si" style="flex:1"><div class="sn">LLC</div><div class="sl">Verified</div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P1 ABOUT -->
+  <div class="panel" id="p1">
+    <div class="box"><div class="inner">
+      <div class="lbl" style="text-align:center">About Daly.biz</div>
+      <h2 class="ttl" style="text-align:center">One consultant. <em>Full stack.</em></h2>
+      <div class="rule" style="margin-left:auto;margin-right:auto"></div>
+      <p class="bd" style="max-width:580px;text-align:center;margin-left:auto;margin-right:auto">Daly.biz is a consulting firm helping founders, traders, and digital-first businesses design, build, and operate the systems behind their ideas. From technical infrastructure to strategy and automation, Daly.biz provides hands-on execution without the overhead of a traditional agency.</p>
+    </div></div>
+  </div>
+
+  <!-- P2 TRAITS -->
+  <div class="panel" id="p2">
+    <div class="box"><div class="inner">
+      <div class="lbl">Core Traits</div>
+      <h2 class="ttl">What I bring <em>to the table</em></h2>
+      <div class="stack" style="margin-top:1.2rem">
+        <div class="blk"><div class="bn">Trait 01</div><div class="bt">Community Architect</div><div class="bb">Builds Discord servers and bot ecosystems from scratch — roles, flows, automation, and culture baked in from day one.</div></div>
+        <div class="blk"><div class="bn">Trait 02</div><div class="bt">Creative Producer</div><div class="bb">Adobe Premiere, After Effects, Illustrator — video edits, motion graphics, and custom SVG brand assets, all in-house.</div></div>
+        <div class="blk"><div class="bn">Trait 03</div><div class="bt">Ops &amp; Systems Thinker</div><div class="bb">Scheduling, SOPs, Whop commerce, and project management — keeps CEOs, CFOs, and founders running lean and on track.</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P3 SERVICES 1/2 -->
+  <div class="panel" id="p3">
+    <div class="box" style="max-height:calc(100vh - 8rem)"><div class="inner" style="padding-bottom:2rem">
+      <div class="lbl">What I Build — 1 of 2</div>
+      <h2 class="ttl" style="margin-bottom:1rem">End-to-end <em>digital services</em></h2>
+      <div style="display:flex;flex-direction:column;border:1px solid rgba(40,22,0,.1);overflow:hidden">
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">01</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Discord Bot Development</div><div class="bb">Custom bots, commands, automation, moderation, and integrations. Full deployment included.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">CUSTOM</span>
+        </div>
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">02</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Discord Server Setup</div><div class="bb">Complete architecture — roles, channels, verification flows, ticketing, and bot ecosystems.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">CONFIG</span>
+        </div>
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">03</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Whop Stores &amp; Academies</div><div class="bb">Memberships, paywalled content, community access, and automated delivery — fully configured.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">COMMERCE</span>
+        </div>
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">04</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Executive Scheduling &amp; Ops</div><div class="bb">Time-blocking, calendar systems, and SOPs for CEOs and CFOs who need structured accountability.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">OPS</span>
+        </div>
+        <div class="blk" style="border:none;display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">05</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Video Editing — Adobe Suite</div><div class="bb">Premiere Pro &amp; After Effects — short-form, promos, course content, and motion graphics.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">ADOBE</span>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P4 SERVICES 2/2 -->
+  <div class="panel" id="p4">
+    <div class="box" style="max-height:calc(100vh - 8rem)"><div class="inner" style="padding-bottom:2rem">
+      <div class="lbl">What I Build — 2 of 2</div>
+      <h2 class="ttl" style="margin-bottom:1rem">End-to-end <em>digital services</em></h2>
+      <div style="display:flex;flex-direction:column;border:1px solid rgba(40,22,0,.1);overflow:hidden">
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">06</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">SVG &amp; Graphic Design</div><div class="bb">Hand-crafted vector art, logos, icons, and brand assets. Scalable, production-ready files.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">DESIGN</span>
+        </div>
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">07</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Website Development &amp; Moderation</div><div class="bb">Front-end builds, landing pages, and ongoing site moderation — fast, accurate, on-brand.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">WEB</span>
+        </div>
+        <div class="blk" style="border:none;border-bottom:1px solid rgba(40,22,0,.1);display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">08</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Project &amp; Task Management</div><div class="bb">Notion, Trello, or Asana setup with dashboards, automations, and workflows your team will use.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">PM</span>
+        </div>
+        <div class="blk" style="border:none;display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem">
+          <div style="min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:rgba(40,22,0,.3)">09</div>
+          <div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Social Media &amp; Copywriting</div><div class="bb">Content calendars, post copy, and launch assets consistent with your brand voice.</div></div>
+          <span class="btag" style="margin-top:0;flex-shrink:0">GROWTH</span>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P5 PROCESS -->
+  <div class="panel" id="p5">
+    <div class="box"><div class="inner">
+      <div class="lbl">The Process</div>
+      <h2 class="ttl">Your project, <em>executed.</em></h2>
+      <div class="rule"></div>
+      <div class="steps">
+        <div class="step"><div class="sn2">01</div><h3>Discovery Call</h3><p>Align on goals, scope, and timeline. You explain the need — I map the path.</p></div>
+        <div class="step"><div class="sn2">02</div><h3>Scoped Proposal</h3><p>Clear deliverables and flat pricing. No surprises, no scope creep.</p></div>
+        <div class="step"><div class="sn2">03</div><h3>Build &amp; Execute</h3><p>Fast, focused delivery with direct communication throughout.</p></div>
+        <div class="step"><div class="sn2">04</div><h3>Delivery &amp; Handoff</h3><p>Final delivery with docs, training if needed, and optional ongoing support.</p></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P6 OTG -->
+  <div class="panel" id="p6">
+    <div class="box"><div class="inner">
+      <div class="lbl"><span class="pulse"></span>Official Partner</div>
+      <h2 class="ttl">OTG Trading <em>Academy</em></h2>
+      <div class="rule"></div>
+      <div class="otg-grid">
+        <div>
+          <p class="bd" style="margin-bottom:1.6rem">Daley.biz is the infrastructure partner behind OTG Trading Academy — Discord architecture, bot automation, Whop management, and community operations for one of the most structured trading academies online.</p>
+          <a href="https://otg-academy-landing-page.netlify.app/" target="_blank" class="btn-o">Visit OTG Academy →</a>
+        </div>
+        <div class="pt">
+          <h4>Services Provided to OTG</h4>
+          <div class="ptr"><span>Discord Architecture</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Bot Development</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Whop Management</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Community Moderation</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Website Infrastructure</span><span class="pts">ACTIVE</span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P7 SKILLS -->
+  <div class="panel" id="p7">
+    <div class="box"><div class="inner">
+      <div class="lbl">Full Toolkit</div>
+      <h2 class="ttl">Skills <em>&amp;</em> Tools</h2>
+      <div class="rule"></div>
+      <div class="pills">
+        <div class="pill">Discord.js</div><div class="pill">Bot Hosting</div><div class="pill">Whop Platform</div>
+        <div class="pill">Adobe Premiere Pro</div><div class="pill">Adobe After Effects</div><div class="pill">Adobe Illustrator</div>
+        <div class="pill">Custom SVG</div><div class="pill">HTML / CSS</div><div class="pill">JavaScript</div>
+        <div class="pill">Site Moderation</div><div class="pill">Notion</div><div class="pill">Google Calendar</div>
+        <div class="pill">Executive Scheduling</div><div class="pill">Community Moderation</div><div class="pill">Brand Copywriting</div>
+        <div class="pill">Content Strategy</div><div class="pill">Short-form Video</div><div class="pill">Workflow Automation</div>
+        <div class="pill">Role &amp; Permission Design</div><div class="pill">Onboarding Flows</div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P8 CONTACT -->
+  <div class="panel" id="p8">
+    <div class="box"><div class="inner">
+      <div class="lbl">Let's Work</div>
+      <h2 class="ttl">Start a <em>project</em></h2>
+      <div class="rule"></div>
+      <div class="contact-grid">
+        <div>
+          <p class="bd">Tell me what you're building. I'll respond within 24 hours with clear scope and flat pricing.</p>
+          <p class="bd" style="opacity:.6">No commitment required for the first call.</p>
+          <a href="https://otg-academy-landing-page.netlify.app/" target="_blank" class="extl">OTG Trading Academy Partner ↗</a>
+          <p style="margin-top:2rem;font-size:.63rem;letter-spacing:.08em;color:rgba(40,22,0,.3)">© 2025 DALY.BIZ LLC</p>
+        </div>
+        <div class="cf">
+          <div class="frow">
+            <input type="text" placeholder="Your name">
+            <input type="email" placeholder="Email">
+          </div>
+          <select>
+            <option value="" disabled selected>Service needed…</option>
+            <option>Discord Bot / Server Setup</option>
+            <option>Whop Store or Academy</option>
+            <option>Executive Scheduling &amp; Ops</option>
+            <option>Video Editing (Adobe)</option>
+            <option>SVG / Graphic Design</option>
+            <option>Website Development</option>
+            <option>Trading Community Setup</option>
+            <option>Something else</option>
+          </select>
+          <textarea placeholder="Brief project description…"></textarea>
+          <button class="subbtn" id="subBtn">Send Message →</button>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  FRACTAL — tan/cream, slow morph, NO LAG
+//  Uses requestIdleCallback so heavy pixel work
+//  doesn't block scroll snapping
+// ══════════════════════════════════════════════
+const fc  = document.getElementById('fc');
+const ctx = fc.getContext('2d');
+
+let W, H, oW, oH, ofc, ox, buf;
+
+function resize(){
+  W = window.innerWidth;  H = window.innerHeight;
+  fc.width = W; fc.height = H;
+  // offscreen at 35% — crisp enough, very fast
+  oW = Math.max(2, W * .35 | 0);
+  oH = Math.max(2, H * .35 | 0);
+  ofc = document.createElement('canvas');
+  ofc.width = oW; ofc.height = oH;
+  ox  = ofc.getContext('2d');
+  buf = ox.createImageData(oW, oH);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Fractal parameters — one per panel, lerped smoothly
+// Using only beautiful, unique regions
+const PARAMS = [
+  { cx:-.7269, cy:.1889, z:1.8,  jl:true  },  // 0 hero     — Douady rabbit julia
+  { cx:-.4,    cy:.6,    z:1.6,  jl:true  },  // 1 about    — spiral julia
+  { cx:-.8,    cy:.156,  z:1.5,  jl:true  },  // 2 traits   — dendrite julia
+  { cx:.285,   cy:.01,   z:1.7,  jl:true  },  // 3 svc1     — feather julia
+  { cx:-.7,    cy:.27,   z:1.55, jl:true  },  // 4 svc2     — rabbit arm
+  { cx:-.1011, cy:.633,  z:1.6,  jl:true  },  // 5 process  — siegel disk
+  { cx:-.5251, cy:.5243, z:1.5,  jl:true  },  // 6 otg      — coral
+  { cx:.3,     cy:.5,    z:1.65, jl:true  },  // 7 skills   — soft tendrils
+  { cx:-.7269, cy:-.1889,z:1.8,  jl:true  },  // 8 contact  — mirror rabbit
+];
+
+function lerp(a,b,t){ return a+(b-a)*t }
+function lerpP(a,b,t){
+  return {
+    cx: lerp(a.cx,b.cx,t), cy: lerp(a.cy,b.cy,t),
+    z:  a.z*Math.pow(b.z/a.z,t),
+    jl: true,
+    jx: lerp(a.cx,b.cx,t*.5), // use cx/cy as julia params for smooth variety
+    jy: lerp(a.cy,b.cy,t*.5),
+  };
+}
+
+// Smooth iteration — continuous escape time (no banding)
+const MAX = 96;
+function julia(zx, zy, cx, cy){
+  let x=zx,y=zy,x2=x*x,y2=y*y,i=0;
+  while(x2+y2<=4 && i<MAX){
+    y=2*x*y+cy; x=x2-y2+cx; x2=x*x; y2=y*y; i++;
+  }
+  if(i===MAX) return MAX;
+  // smooth coloring
+  return i + 1 - Math.log2(Math.log2(Math.sqrt(x2+y2)+1e-10));
+}
+
+// Tan/cream palette — warm and rich
+function color(n){
+  if(n>=MAX){ return [38,22,8] }   // deep warm brown (interior)
+  const t = Math.min(n/MAX, 1);
+  // cream → warm sand → tan → amber-brown
+  // all stays in 20–48° hue range (warm yellows/tans)
+  const hue = (20 + t*28) / 360;
+  const sat = 0.22 + t*0.28;
+  const lit = 0.94 - t*0.60;
+  return hslToRgb(hue, sat, lit);
+}
+
+function hslToRgb(h,s,l){
+  if(!s){ const v=l*255|0; return[v,v,v] }
+  const q=l<.5?l*(1+s):l+s-l*s, p=2*l-q;
+  const hh=t=>{ t=((t%1)+1)%1; return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p };
+  return [ hh(h+1/3)*255|0, hh(h)*255|0, hh(h-1/3)*255|0 ];
+}
+
+// State
+let sFrac=0, tFrac=0, wobble=0;
+let frameCount=0, rendering=false;
+
+function renderFrame(){
+  if(rendering) return;
+  rendering = true;
+
+  const pos   = Math.max(0, Math.min(sFrac*(PARAMS.length-1), PARAMS.length-1.001));
+  const idx   = pos|0;
+  const frac  = pos-idx;
+  const pa    = PARAMS[idx], pb = PARAMS[Math.min(idx+1,PARAMS.length-1)];
+
+  // julia c params drift gently using wobble
+  const jcx = lerp(pa.cx,pb.cx,frac) + Math.sin(wobble*0.8)*0.004;
+  const jcy = lerp(pa.cy,pb.cy,frac) + Math.cos(wobble*0.6)*0.003;
+  const zoom = pa.z*Math.pow(pb.z/pa.z,frac);
+  const asp  = oW/oH;
+  const d    = buf.data;
+
+  for(let py=0; py<oH; py++){
+    for(let px=0; px<oW; px++){
+      const zx = (px/oW - .5)*zoom*asp*2;
+      const zy = (py/oH - .5)*zoom*2;
+      const n  = julia(zx, zy, jcx, jcy);
+      const [r,g,b] = color(n);
+      const i = (py*oW+px)*4;
+      d[i]=r; d[i+1]=g; d[i+2]=b; d[i+3]=255;
+    }
+  }
+
+  ox.putImageData(buf,0,0);
+
+  ctx.save();
+  ctx.imageSmoothingEnabled=true;
+  ctx.imageSmoothingQuality='high';
+  ctx.clearRect(0,0,W,H);
+  ctx.drawImage(ofc,0,0,W,H);
+
+  // warm vignette
+  const vg = ctx.createRadialGradient(W/2,H/2,H*.05,W/2,H/2,H*.9);
+  vg.addColorStop(0,'rgba(0,0,0,0)');
+  vg.addColorStop(1,'rgba(30,15,2,.4)');
+  ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  rendering = false;
+}
+
+// Decouple fractal rendering from scroll — render only when idle
+// This prevents lag during scroll snapping
+function scheduleRender(){
+  if('requestIdleCallback' in window){
+    requestIdleCallback(()=>{ renderFrame(); }, {timeout:80});
+  } else {
+    setTimeout(renderFrame, 16);
+  }
+}
+
+function loop(){
+  // Smooth interpolation — very slow drift
+  sFrac += (tFrac-sFrac)*0.006;
+  wobble += 0.004;
+  frameCount++;
+  // Only re-render fractal every 3 animation frames (20fps fractal, 60fps UI)
+  if(frameCount%3===0) scheduleRender();
+  requestAnimationFrame(loop);
+}
+
+// ══════════════════════════════════════════════
+//  PANEL NAVIGATION
+// ══════════════════════════════════════════════
+const app    = document.getElementById('app');
+const panels = [...document.querySelectorAll('.panel')];
+const N      = panels.length;
+const dotsEl = document.getElementById('dots');
+const pbar   = document.getElementById('pbar');
+let cur = 0;
+
+const LABELS = ['Home','About','Traits','Svcs 1','Svcs 2','Process','OTG','Skills','Contact'];
+panels.forEach((_,i)=>{
+  const d = document.createElement('button');
+  d.className='dot'+(i===0?' on':'');
+  d.title=LABELS[i]; d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+});
+
+function goTo(i){
+  if(i<0||i>=N) return;
+  panels[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});
+  updateUI(i);
+}
+function updateUI(i){
+  cur=i;
+  [...dotsEl.querySelectorAll('.dot')].forEach((d,j)=>d.classList.toggle('on',j===i));
+  pbar.style.width=((i/(N-1))*100)+'%';
+  tFrac=i/(N-1);
+}
+
+// IntersectionObserver for reliable snap detection
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.intersectionRatio>.55){
+      const i=panels.indexOf(e.target);
+      if(i!==-1) updateUI(i);
+    }
+  });
+},{threshold:.55,root:app});
+panels.forEach(p=>io.observe(p));
+
+// Wheel — debounced so one scroll = one panel
+let wlk=false;
+app.addEventListener('wheel',e=>{
+  e.preventDefault();
+  if(wlk)return; wlk=true;
+  goTo(cur+(e.deltaX>0||e.deltaY>0?1:-1));
+  setTimeout(()=>wlk=false,650);
+},{passive:false});
+
+// Arrow keys
+window.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();goTo(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();goTo(cur-1);}
+});
+
+// Touch swipe
+let tx0=0,ty0=0;
+app.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;},{passive:true});
+app.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx0;
+  const dy=e.changedTouches[0].clientY-ty0;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40) goTo(cur+(dx<0?1:-1));
+},{passive:true});
+
+document.getElementById('subBtn').onclick=function(){
+  this.textContent='✓ Sent';this.style.background='rgba(30,80,14,.8)';this.disabled=true;
+  setTimeout(()=>{this.textContent='Send Message →';this.style.background='';this.disabled=false;},3000);
+};
+
+// Kick off
+resize();
+renderFrame(); // immediate first draw
+loop();
+</script>
+</body>
+</html>
