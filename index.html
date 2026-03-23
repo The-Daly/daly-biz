@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>DALY.BIZ</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
@@ -153,6 +154,489 @@ nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:.85rem 2rem;display:f
       </div>
     </div></div>
   </div>
+
+  <!-- CLASSICAL MUSIC TRIP PLANNER — full-screen vertical scroll panel -->
+  <div class="panel" id="p_music" style="align-items:stretch;padding:0;height:100vh;overflow:hidden;">
+    <div id="cmp-scroll" style="width:100%;height:100%;overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:4.5rem 2rem 3.5rem;display:flex;flex-direction:column;align-items:center;box-sizing:border-box;">
+      <div style="width:100%;max-width:860px;flex-shrink:0;">
+
+        <!-- Header -->
+        <div class="lbl">Side Project</div>
+        <h2 class="ttl">Classical Music <em>Trip Planner</em></h2>
+        <div class="rule"></div>
+
+        <!-- Box wrapper -->
+        <div style="background:#faf5ec;border:1px solid #e8dcc8;border-radius:3px;box-shadow:0 8px 48px rgba(80,50,10,.15);overflow:hidden;margin-top:.5rem;">
+
+          <!-- 3D Piano Stage -->
+          <div id="cmp-stage" style="position:relative;width:100%;height:240px;background:radial-gradient(ellipse at 50% 60%,#1e140a,#050402);cursor:pointer;touch-action:manipulation;">
+            <canvas id="cmp-canvas" style="width:100%;height:100%;display:block;touch-action:manipulation;"></canvas>
+            <div id="cmp-overlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:1.4rem;pointer-events:none;background:linear-gradient(0deg,rgba(10,8,6,.7) 0%,transparent 55%);transition:opacity .5s ease;">
+              <div style="width:1px;height:28px;background:linear-gradient(180deg,transparent,#b89a60);margin-bottom:.4rem;position:relative;">
+                <div style="position:absolute;bottom:-1px;left:-3px;width:7px;height:7px;border-right:1px solid #b89a60;border-bottom:1px solid #b89a60;transform:rotate(45deg)"></div>
+              </div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:.62rem;letter-spacing:.28em;color:#b89a60;text-transform:uppercase;animation:cmpPulse 2.5s ease-in-out infinite">Tap piano to begin</div>
+            </div>
+          </div>
+
+          <!-- Keyboard -->
+          <div id="cmp-keyboard-wrap" style="max-height:0;overflow:hidden;transition:max-height 0.6s cubic-bezier(0.16,1,0.3,1);border-top:1px solid #e8dcc8;background:#fdf8ef;">
+            <div style="padding:1rem .75rem 1.2rem;">
+              <p style="font-family:'DM Sans',sans-serif;font-size:.72rem;color:#8a7050;text-align:center;margin-bottom:.9rem;letter-spacing:.04em">Select a <strong style="color:#5a3800">note</strong> — let it compose your journey</p>
+              <div id="cmp-keys" style="display:flex;justify-content:center;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:.25rem;position:relative;"></div>
+            </div>
+          </div>
+
+          <!-- Results -->
+          <div id="cmp-results" style="max-height:0;overflow:hidden;transition:max-height 0.8s cubic-bezier(0.16,1,0.3,1);">
+            <div style="padding:1.4rem 1.4rem 1.8rem;" id="cmp-results-inner">
+              <div id="cmp-note-hero" style="text-align:center;padding:.8rem 0 1.2rem;border-bottom:1px solid #e8dcc8;margin-bottom:1.4rem;"></div>
+              <div class="lbl" style="margin-bottom:.8rem">Featured Repertoire</div>
+              <div id="cmp-music-grid" style="display:flex;flex-direction:column;border:1px solid #e8dcc8;border-radius:2px;overflow:hidden;margin-bottom:1.4rem;"></div>
+              <div class="lbl" style="margin-bottom:.8rem">Your Curated Journey</div>
+              <div id="cmp-trip-card" style="border:1px solid #e8dcc8;background:#fdf8ef;border-radius:2px;padding:1.2rem;margin-bottom:1.2rem;"></div>
+              <!-- Getaway deal + CTA -->
+              <div id="cmp-deal-block" style="display:none;"></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:.75rem;padding-top:.5rem;flex-wrap:wrap;">
+                <button onclick="cmpReset()" style="font-family:'DM Sans',sans-serif;font-size:.62rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;background:#fdf8ef;color:#7a5a30;border:1px solid #c4a870;padding:.65rem 1.4rem;cursor:pointer;touch-action:manipulation;">↩ Choose Another Note</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /box -->
+
+        <div id="cmp-scroll-hint" style="text-align:center;margin-top:1.2rem;opacity:.45;">
+          <p style="font-family:'DM Sans',sans-serif;font-size:.6rem;letter-spacing:.18em;color:#8a7050;text-transform:uppercase;">↓ Scroll to see results</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <style>
+  @keyframes cmpPulse{0%,100%{opacity:.5}50%{opacity:1}}
+  #cmp-scroll{touch-action:pan-y;}
+  #cmp-scroll::-webkit-scrollbar{width:3px}
+  #cmp-scroll::-webkit-scrollbar-thumb{background:#d4c4a8;border-radius:2px}
+
+  .cmp-wkey{
+    width:38px;height:112px;
+    background:linear-gradient(180deg,#f5f2ec,#ede8de 60%,#ddd5c5);
+    border:1px solid rgba(0,0,0,.18);border-radius:0 0 5px 5px;
+    cursor:pointer;position:relative;flex-shrink:0;
+    transition:background .1s,transform .1s;
+    box-shadow:inset -1px 0 0 rgba(255,255,255,.5),0 3px 8px rgba(0,0,0,.2);
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;user-select:none;
+  }
+  .cmp-wkey:active{background:linear-gradient(180deg,#fffef8,#f5f0e2 60%,#e8dfc8);transform:translateY(2px)}
+  .cmp-wkey.cmp-active{background:linear-gradient(180deg,#e8c97a,#b89a60)!important;transform:translateY(3px)!important;}
+  .cmp-bkey{
+    width:24px;height:70px;
+    background:linear-gradient(180deg,#2a2218,#1a1410 50%,#0d0a08);
+    position:absolute;top:0;z-index:2;border-radius:0 0 4px 4px;
+    cursor:pointer;transition:background .1s,transform .1s;
+    box-shadow:2px 4px 8px rgba(0,0,0,.6);
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;user-select:none;
+  }
+  .cmp-bkey:active{transform:translateY(2px)}
+  .cmp-bkey.cmp-active{background:linear-gradient(180deg,#b89a60,#7a6030)!important;transform:translateY(3px)!important;}
+
+  .cmp-music-row{display:flex;align-items:flex-start;gap:.7rem;padding:.7rem .9rem;border-bottom:1px solid #e8dcc8;background:#fdf8ef;}
+  .cmp-music-row:last-child{border-bottom:none}
+
+  @media(max-width:600px){
+    #p_music{padding:0!important;height:100vh!important;}
+    #cmp-scroll{padding:3.5rem .75rem 2.5rem!important;}
+    #cmp-stage{height:160px!important;}
+    .cmp-wkey{width:24px!important;height:80px!important;}
+    .cmp-bkey{width:16px!important;height:50px!important;}
+    #cmp-results-inner{padding:1rem .9rem 1.4rem!important;}
+    #cmp-trip-card{padding:.9rem!important;}
+  }
+  </style>
+
+  <script>
+  // ── CMP: Classical Music Trip Planner panel ──
+  (function(){
+    const NOTE_THEMES={C:{mood:'Serene',theme:'Clarity & Peace',emoji:'🌊'},D:{mood:'Joyful',theme:'Radiance & Warmth',emoji:'☀️'},E:{mood:'Romantic',theme:'Love & Longing',emoji:'🌹'},F:{mood:'Pastoral',theme:'Nature & Repose',emoji:'🌿'},G:{mood:'Heroic',theme:'Triumph & Grandeur',emoji:'⚔️'},A:{mood:'Melancholic',theme:'Depth & Sorrow',emoji:'🌙'},B:{mood:'Mystical',theme:'Wonder & Mystery',emoji:'✨'},'C#':{mood:'Dramatic',theme:'Passion & Fire',emoji:'🔥'},'D#':{mood:'Playful',theme:'Wit & Delight',emoji:'🎭'},'F#':{mood:'Ethereal',theme:'Dreams & Light',emoji:'🌅'},'G#':{mood:'Tender',theme:'Intimacy & Grace',emoji:'🕊️'},'A#':{mood:'Turbulent',theme:'Storm & Power',emoji:'⛈️'}};
+    const MUSIC={Serene:[{c:'Debussy',t:'Clair de Lune',d:'Suite bergamasque · 1905'},{c:'Satie',t:'Gymnopédie No.1',d:'Trois Gymnopédies · 1888'},{c:'Chopin',t:'Nocturne in E♭ major',d:'Op.9 No.2 · 1832'}],Joyful:[{c:'Mozart',t:'Eine Kleine Nachtmusik',d:'Serenade No.13 · 1787'},{c:'Vivaldi',t:'Spring',d:'The Four Seasons · 1725'},{c:'Beethoven',t:'Ode to Joy',d:'Symphony No.9 · 1824'}],Romantic:[{c:'Chopin',t:'Ballade No.1 in G minor',d:'Op.23 · 1835'},{c:'Liszt',t:'Liebestraum No.3',d:'Love Dreams · 1850'},{c:'Schumann',t:'Träumerei',d:'Kinderszenen · 1838'}],Pastoral:[{c:'Beethoven',t:'Symphony No.6',d:'Pastoral · 1808'},{c:'Schubert',t:'The Trout Quintet',d:'D.667 · 1819'},{c:'Sibelius',t:'Finlandia',d:'Op.26 · 1899'}],Heroic:[{c:'Beethoven',t:'Symphony No.5',d:'Op.67 · 1808'},{c:'Brahms',t:'Symphony No.1',d:'Op.68 · 1876'},{c:'Wagner',t:'Ride of the Valkyries',d:'Die Walküre · 1870'}],Melancholic:[{c:'Barber',t:'Adagio for Strings',d:'Op.11 · 1936'},{c:'Albinoni',t:'Adagio in G minor',d:'1958'},{c:'Rachmaninoff',t:'Piano Concerto No.2',d:'Op.18 · 1901'}],Mystical:[{c:'Holst',t:'The Planets: Neptune',d:'Op.32 · 1917'},{c:'Ravel',t:'Bolero',d:'1928'},{c:'Pärt',t:'Spiegel im Spiegel',d:'1978'}],Dramatic:[{c:'Beethoven',t:'Moonlight Sonata (III)',d:'Op.27 No.2 · 1802'},{c:'Liszt',t:'Hungarian Rhapsody No.2',d:'S.359 · 1847'},{c:'Mussorgsky',t:'Night on Bald Mountain',d:'1867'}],Playful:[{c:'Prokofiev',t:'Peter and the Wolf',d:'Op.67 · 1936'},{c:'Saint-Saëns',t:'Carnival of the Animals',d:'1886'},{c:'Rimsky-Korsakov',t:'Flight of the Bumblebee',d:'1900'}],Ethereal:[{c:'Fauré',t:'Pavane',d:'Op.50 · 1887'},{c:'Ravel',t:'Daphnis et Chloé Suite 2',d:'1913'},{c:'Debussy',t:'La Mer',d:'1905'}],Tender:[{c:'Schubert',t:'Ave Maria',d:'D.839 · 1825'},{c:'Bach',t:"Jesu, Joy of Man's Desiring",d:'BWV 147 · 1723'},{c:'Grieg',t:'Morning Mood',d:'Peer Gynt · 1875'}],Turbulent:[{c:'Beethoven',t:'Tempest Sonata',d:'Op.31 No.2 · 1802'},{c:'Brahms',t:'Intermezzo in B minor',d:'Op.119 No.1 · 1893'},{c:'Mahler',t:'Symphony No.6',d:'1906'}]};
+    const TRIPS=[{dest:'Vienna',country:'Austria',theme:'Imperial Legacy',emoji:'🏛️',desc:'Walk the gilded halls where Mozart premiered symphonies and Beethoven raged against silence. The Musikverein awaits.',duration:'7 nights',season:'Oct – Apr',moods:['Heroic','Romantic','Dramatic','Joyful']},{dest:'Venice',country:'Italy',theme:'Baroque Waterways',emoji:'🚤',desc:'Float through canals where Vivaldi composed feverishly. Let the water carry you between palazzos and opera houses.',duration:'5 nights',season:'Mar – Jun',moods:['Romantic','Tender','Ethereal','Pastoral']},{dest:'Kyoto',country:'Japan',theme:'Zen & Stillness',emoji:'🌸',desc:'Cherry blossoms fall in silence broken only by temple bells. The discipline of Zen mirrors the meticulous counterpoint of Bach.',duration:'10 nights',season:'Mar – May',moods:['Serene','Mystical','Melancholic','Ethereal']},{dest:'Edinburgh',country:'Scotland',theme:'Highland Drama',emoji:'🏰',desc:'Storm-lashed castles and misty moors — a land built for the turbulent symphonies of the Romantics.',duration:'6 nights',season:'Sep – Nov',moods:['Turbulent','Heroic','Melancholic','Dramatic']},{dest:'Salzburg',country:'Austria',theme:'Musical Birthplace',emoji:'🎵',desc:'Born of Mozart himself, this baroque jewel is Europe\'s musical heart. Every cobblestone resonates with centuries of composition.',duration:'4 nights',season:'Jul – Aug',moods:['Joyful','Playful','Serene','Tender']}];
+    function getTrip(mood){const m=TRIPS.filter(t=>t.moods.includes(mood));return m.length?m[Math.floor(Math.random()*m.length)]:TRIPS[0];}
+
+    // ── Mini Three.js piano ──
+    let scene2,cam2,ren2,raf2,pg2,clicked2=false,t2=0,orbitAngle2=0;
+    function initMiniPiano(){
+      const canvas=document.getElementById('cmp-canvas');
+      const stage=document.getElementById('cmp-stage');
+      if(!window.THREE||!stage||!canvas){return;}
+
+      // Force the stage to report its real size
+      const W=stage.offsetWidth||stage.clientWidth||600;
+      const H=stage.offsetHeight||stage.clientHeight||240;
+
+      scene2=new THREE.Scene();
+      scene2.background=new THREE.Color(0x060402);
+      scene2.fog=new THREE.FogExp2(0x060402,0.018);
+
+      cam2=new THREE.PerspectiveCamera(45, W/H, 0.1, 300);
+      cam2.position.set(0, 3, 14);
+      cam2.lookAt(0, 0, 0);
+
+      ren2=new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+      ren2.setPixelRatio(Math.min(window.devicePixelRatio,2));
+      ren2.setSize(W, H);
+      ren2.shadowMap.enabled=true;
+      ren2.shadowMap.type=THREE.PCFSoftShadowMap;
+      ren2.toneMapping=THREE.ACESFilmicToneMapping;
+      ren2.toneMappingExposure=1.0;
+
+      // Lighting
+      scene2.add(new THREE.AmbientLight(0x5a4030, 1.2));
+      const kl=new THREE.DirectionalLight(0xfff5ee, 4.0);
+      kl.position.set(5,12,8); kl.castShadow=true;
+      kl.shadow.mapSize.set(1024,1024);
+      scene2.add(kl);
+      const fl=new THREE.DirectionalLight(0xc9a84c, 1.5);
+      fl.position.set(-8,4,-4); scene2.add(fl);
+      const rim=new THREE.PointLight(0xd4b86a, 2.5, 50);
+      rim.position.set(0,10,-6); scene2.add(rim);
+      const bot=new THREE.PointLight(0x204080, 0.6, 20);
+      bot.position.set(0,-3,3); scene2.add(bot);
+
+      buildMiniPiano();
+      animateMini();
+      stage.addEventListener('pointerdown', ()=>onMiniClick());
+      window.addEventListener('resize',()=>{
+        if(!ren2)return;
+        const s=document.getElementById('cmp-stage');
+        const nW=s.offsetWidth, nH=s.offsetHeight;
+        cam2.aspect=nW/nH; cam2.updateProjectionMatrix();
+        ren2.setSize(nW,nH);
+      });
+    }
+    function buildMiniPiano(){
+      pg2=new THREE.Group();scene2.add(pg2);
+      const S=0.7; // Smaller scale — fits nicely in a 240px tall stage
+      const lm=new THREE.MeshStandardMaterial({color:0x0a0806,roughness:0.04,metalness:0.3});
+      const ltm=new THREE.MeshStandardMaterial({color:0x100d09,roughness:0.015,metalness:0.2});
+      const im=new THREE.MeshStandardMaterial({color:0xf2ede0,roughness:0.3,metalness:0});
+      const bm=new THREE.MeshStandardMaterial({color:0x060402,roughness:0.05,metalness:0.35});
+      const gm=new THREE.MeshStandardMaterial({color:0xc9a84c,roughness:0.18,metalness:0.9});
+
+      // Grand piano body shape
+      const sh=new THREE.Shape();
+      sh.moveTo(-6*S, 3*S); sh.lineTo(6*S, 3*S); sh.lineTo(6*S, -0.5*S);
+      sh.bezierCurveTo(6*S,-2.5*S, 4*S,-4.5*S, 2*S,-5*S);
+      sh.bezierCurveTo(0,-5.5*S, -2*S,-5*S, -3.5*S,-3.8*S);
+      sh.bezierCurveTo(-5.5*S,-2.5*S, -7*S,0, -6*S,3*S);
+      sh.closePath();
+
+      const extOpts={depth:1.6*S,bevelEnabled:true,bevelThickness:0.06*S,bevelSize:0.05*S,bevelSegments:3};
+      const body=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,extOpts),lm);
+      body.rotation.x=Math.PI/2; body.position.set(0,-0.8*S,1.5*S); body.castShadow=true; pg2.add(body);
+
+      // Lid (flat top)
+      const lid=new THREE.Mesh(new THREE.ExtrudeGeometry(sh,{depth:0.07*S,bevelEnabled:false}),ltm);
+      lid.rotation.x=Math.PI/2; lid.position.set(0,0.82*S,1.5*S); pg2.add(lid);
+
+      // Raised lid (propped open)
+      const rls=new THREE.Shape([
+        new THREE.Vector2(-5.5*S,0),new THREE.Vector2(5.5*S,0),
+        new THREE.Vector2(5.5*S,4.5*S),new THREE.Vector2(-5.5*S,4.5*S)
+      ]);
+      const rLid=new THREE.Mesh(new THREE.ExtrudeGeometry(rls,{depth:0.07*S,bevelEnabled:false}),ltm);
+      rLid.rotation.x=Math.PI/2-0.85; rLid.position.set(0,0.86*S,-0.9*S); pg2.add(rLid);
+
+      // Prop stick
+      const prop=new THREE.Mesh(new THREE.CylinderGeometry(0.03*S,0.03*S,3*S,8),gm);
+      prop.rotation.z=0.35; prop.position.set(3.2*S,1.4*S,-0.5*S); pg2.add(prop);
+
+      // Key bed
+      const kbW=10*S;
+      const keyBed=new THREE.Mesh(new THREE.BoxGeometry(kbW,0.18*S,2*S),bm);
+      keyBed.position.set(0,0.82*S,2.85*S); pg2.add(keyBed);
+
+      // White keys (10 keys for clean look)
+      const wg=new THREE.BoxGeometry(0.65*S,0.14*S,1.8*S);
+      for(let i=0;i<13;i++){
+        const w=new THREE.Mesh(wg,im);
+        w.position.set((i-6)*(0.7*S),0.93*S,2.85*S); pg2.add(w);
+      }
+      // Black keys
+      const bg2=new THREE.BoxGeometry(0.4*S,0.26*S,1.1*S);
+      [0,1,3,4,5,7,8,10,11].forEach(wi=>{
+        const b=new THREE.Mesh(bg2,bm);
+        b.position.set((wi-6)*(0.7*S)+0.35*S,1.06*S,2.2*S); pg2.add(b);
+      });
+
+      // Fallboard
+      const fb=new THREE.Mesh(new THREE.BoxGeometry(kbW+0.2*S,0.1*S,0.85*S),lm);
+      fb.position.set(0,0.87*S,1.82*S); fb.rotation.x=-0.06; pg2.add(fb);
+
+      // Legs (3 classic grand legs)
+      const lg=new THREE.CylinderGeometry(0.16*S,0.12*S,3.2*S,14);
+      [[-4.8*S,-2.4*S,2.4*S],[4.8*S,-2.4*S,2.4*S],[-0.2*S,-2.4*S,-3.8*S]].forEach(([x,y,z])=>{
+        const l=new THREE.Mesh(lg,lm); l.position.set(x,y,z); l.castShadow=true; pg2.add(l);
+        const c=new THREE.Mesh(new THREE.CylinderGeometry(0.16*S,0.16*S,0.14*S,14),gm);
+        c.position.set(x,y-1.7*S,z); pg2.add(c);
+      });
+
+      // Gold trim
+      const trim=new THREE.Mesh(new THREE.BoxGeometry(kbW+0.2*S,0.03*S,0.03*S),gm);
+      trim.position.set(0,0.82*S,3.82*S); pg2.add(trim);
+
+      // Floor
+      const fl2=new THREE.Mesh(new THREE.PlaneGeometry(80,80),
+        new THREE.MeshStandardMaterial({color:0x040302,roughness:0.9,metalness:0.1}));
+      fl2.rotation.x=-Math.PI/2; fl2.position.y=-4.0*S; fl2.receiveShadow=true; scene2.add(fl2);
+
+      // Center the group — shift up slightly so body is in view, legs cut off at bottom (cinematic)
+      pg2.position.set(0, 1.2, 0);
+    }
+    function animateMini(){
+      raf2=requestAnimationFrame(animateMini);t2+=0.005;
+      if(!clicked2){
+        orbitAngle2+=0.0025;
+        // Orbit radius 12 works well for S=0.7 piano — shows full body
+        const cx=Math.sin(orbitAngle2)*12;
+        const cz=Math.cos(orbitAngle2)*12;
+        const cy=2.5+Math.sin(orbitAngle2*0.4)*1.8;
+        cam2.position.set(cx,cy,cz);
+        cam2.lookAt(0,1.2,0);
+        if(pg2){
+          pg2.rotation.y=t2*0.06;
+          pg2.position.y=1.2+Math.sin(t2*0.25)*0.06;
+        }
+      } else {
+        // Zoom to top-down keyboard view
+        cam2.position.x+=(0-cam2.position.x)*0.05;
+        cam2.position.y+=(8-cam2.position.y)*0.05;
+        cam2.position.z+=(4-cam2.position.z)*0.05;
+        if(pg2){
+          let dy=(0-pg2.rotation.y)%(Math.PI*2);
+          pg2.rotation.y+=dy*0.07;
+          pg2.position.y+=(1.2-pg2.position.y)*0.07;
+        }
+        cam2.lookAt(0,1.2,0);
+      }
+      if(ren2)ren2.render(scene2,cam2);
+    }
+    function onMiniClick(){
+      if(clicked2)return;clicked2=true;
+      document.getElementById('cmp-overlay').style.opacity='0';
+      const hint=document.getElementById('cmp-scroll-hint');
+      if(hint)hint.style.display='none';
+      setTimeout(()=>{
+        document.getElementById('cmp-stage').style.height='140px';
+        document.getElementById('cmp-keyboard-wrap').style.maxHeight='200px';
+        buildCmpKeys();
+      },800);
+    }
+
+    // ── Keys ──
+    const WHITE_N=['C','D','E','F','G','A','B','C','D','E','F','G','A','B'];
+    const BLACK_M={0:'C#',1:'D#',3:'F#',4:'G#',5:'A#',7:'C#',8:'D#',10:'F#',11:'G#',12:'A#'};
+    function buildCmpKeys(){
+      const isMobile=window.innerWidth<=600;
+      const WKW=isMobile?24:38; // white key width in px
+      const WKH=isMobile?80:112;
+      const BKW=isMobile?16:24;
+      const BKH=isMobile?50:70;
+      const BKOffset=isMobile?8:12; // how far black key overlaps right edge of white key
+
+      const wrap=document.getElementById('cmp-keys');
+      wrap.innerHTML='';
+      const cont=document.createElement('div');
+      cont.style.cssText=`position:relative;display:flex;height:${WKH}px;flex-shrink:0;touch-action:pan-x;`;
+
+      WHITE_N.forEach((n)=>{
+        const k=document.createElement('div');
+        k.className='cmp-wkey';
+        k.dataset.note=n;
+        k.style.width=WKW+'px';
+        k.style.height=WKH+'px';
+        k.style.touchAction='manipulation';
+        k.innerHTML=`<span style="position:absolute;bottom:5px;left:50%;transform:translateX(-50%);font-family:'DM Sans',sans-serif;font-size:${isMobile?'.38rem':'.48rem'};color:rgba(0,0,0,.3);pointer-events:none;">${n}</span>`;
+        k.addEventListener('pointerdown',ev=>{ev.stopPropagation();cmpSelect(n,k);});
+        cont.appendChild(k);
+      });
+
+      Object.entries(BLACK_M).forEach(([idx,n])=>{
+        const k=document.createElement('div');
+        k.className='cmp-bkey';
+        k.dataset.note=n;
+        k.style.width=BKW+'px';
+        k.style.height=BKH+'px';
+        k.style.left=(parseInt(idx)*WKW + WKW - BKOffset)+'px';
+        k.style.touchAction='manipulation';
+        k.addEventListener('pointerdown',ev=>{ev.preventDefault();ev.stopPropagation();cmpSelect(n,k);});
+        cont.appendChild(k);
+      });
+
+      wrap.appendChild(cont);
+    }
+
+    function cmpSelect(note,el){
+      document.querySelectorAll('.cmp-wkey,.cmp-bkey').forEach(k=>k.classList.remove('cmp-active'));
+      el.classList.add('cmp-active');
+      playNote(note);
+      const th=NOTE_THEMES[note]||NOTE_THEMES['C'];
+      const music=MUSIC[th.mood]||MUSIC['Serene'];
+      const trip=getTrip(th.mood);
+      renderCmpResults(note,th,music,trip);
+    }
+
+    function playNote(note){
+      try{
+        const ac=new(window.AudioContext||window.webkitAudioContext)();
+        const freq={'C':261.63,'C#':277.18,'D':293.66,'D#':311.13,'E':329.63,'F':349.23,'F#':369.99,'G':392,'G#':415.30,'A':440,'A#':466.16,'B':493.88}[note]||261.63;
+        const osc=ac.createOscillator(),gain=ac.createGain(),flt=ac.createBiquadFilter();
+        flt.type='lowpass';flt.frequency.value=2000;
+        osc.connect(flt);flt.connect(gain);gain.connect(ac.destination);
+        osc.type='triangle';osc.frequency.value=freq;
+        gain.gain.setValueAtTime(0.25,ac.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+1.5);
+        osc.start();osc.stop(ac.currentTime+1.5);
+      }catch(e){}
+    }
+
+    // ── Getaway deals per destination ──
+    const DEALS={
+      Vienna:{
+        type:'flight',
+        tagline:'Direct flights from $389',
+        badge:'FLIGHT DEAL',
+        sub:'Round-trip · Economy · Multiple airlines',
+        url:'https://www.kayak.com/flights/US-c:AT/VIE?sort=price_a',
+        provider:'Search on Kayak',
+        savings:'Save up to 40% booking 6–8 weeks out',
+      },
+      Venice:{
+        type:'cruise',
+        tagline:'Mediterranean Cruise from $699',
+        badge:'CRUISE DEAL',
+        sub:'7-night · Venice roundtrip · Virgin Voyages',
+        url:'https://www.virginvoyages.com/cruises?dest=Mediterranean',
+        provider:'Virgin Voyages',
+        savings:'All-inclusive — no nickel-and-diming',
+      },
+      Kyoto:{
+        type:'flight',
+        tagline:'Flights to Osaka from $542',
+        badge:'FLIGHT DEAL',
+        sub:'Round-trip · Economy · Multiple airlines',
+        url:'https://www.kayak.com/flights/US-c:JP/KIX?sort=price_a',
+        provider:'Search on Kayak',
+        savings:'Kyoto is 15 min by train from KIX airport',
+      },
+      Edinburgh:{
+        type:'flight',
+        tagline:'Flights to Edinburgh from $318',
+        badge:'FLIGHT DEAL',
+        sub:'Round-trip · Economy · Multiple airlines',
+        url:'https://www.kayak.com/flights/US-c:GB/EDI?sort=price_a',
+        provider:'Search on Kayak',
+        savings:'Budget airlines run London–Edinburgh from £30',
+      },
+      Salzburg:{
+        type:'cruise',
+        tagline:'European River Cruise from $899',
+        badge:'CRUISE DEAL',
+        sub:'8-night · Danube · Vienna to Salzburg',
+        url:'https://www.vikingrivercruises.com/cruise-destinations/europe/danube-waltz/',
+        provider:'Viking River Cruises',
+        savings:'Includes all meals, port fees & guided tours',
+      },
+    };
+
+    function renderCmpResults(note,th,music,trip){
+      document.getElementById('cmp-note-hero').innerHTML=`
+        <div style="font-family:'DM Serif Display','Georgia',serif;font-size:2.8rem;font-weight:400;color:#5a3800;line-height:1;margin-bottom:.3rem">${note} <span style="font-style:italic;font-size:1.4rem;color:#8a7050">${th.emoji}</span></div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;letter-spacing:.18em;color:#a08060;text-transform:uppercase;margin-bottom:.2rem">${th.mood}</div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#7a6040;font-style:italic">${th.theme}</div>`;
+
+      document.getElementById('cmp-music-grid').innerHTML=music.map(m=>`
+        <div class="cmp-music-row">
+          <div style="font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:#a08060;text-transform:uppercase;min-width:80px;flex-shrink:0">${m.c}</div>
+          <div style="flex:1">
+            <div style="font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:#1a0e00;font-style:italic">${m.t}</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.7rem;color:#8a7050">${m.d}</div>
+          </div>
+        </div>`).join('');
+
+      document.getElementById('cmp-trip-card').innerHTML=`
+        <div style="display:flex;align-items:flex-start;gap:1rem">
+          <div style="font-size:2rem;flex-shrink:0;margin-top:.1rem">${trip.emoji}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:'DM Sans',sans-serif;font-size:.55rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.25rem">${trip.theme} · ${trip.country}</div>
+            <div style="font-family:'DM Serif Display','Georgia',serif;font-size:1.5rem;color:#1a0e00;margin-bottom:.35rem;line-height:1.1">${trip.dest}</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;line-height:1.65;color:#5a4020;margin-bottom:.8rem">${trip.desc}</div>
+            <div style="display:flex;gap:1.5rem;padding-top:.75rem;border-top:1px solid #e8dcc8;flex-wrap:wrap">
+              <div><div style="font-family:'DM Sans',sans-serif;font-size:.52rem;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.15rem">Duration</div><div style="font-family:'DM Sans',sans-serif;font-size:.8rem;color:#3a2800">${trip.duration}</div></div>
+              <div><div style="font-family:'DM Sans',sans-serif;font-size:.52rem;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.15rem">Best Season</div><div style="font-family:'DM Sans',sans-serif;font-size:.8rem;color:#3a2800">${trip.season}</div></div>
+            </div>
+          </div>
+        </div>`;
+
+      // ── Getaway deal block ──
+      const deal=DEALS[trip.dest]||DEALS.Vienna;
+      const dealIcon=deal.type==='cruise'?'🚢':'✈️';
+      document.getElementById('cmp-deal-block').innerHTML=`
+        <div style="border:1px solid #c4a870;border-radius:3px;overflow:hidden;margin-bottom:1.2rem;">
+          <!-- Deal header bar -->
+          <div style="background:linear-gradient(135deg,#2a1600,#3d2200);padding:.75rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:.6rem">
+              <span style="font-size:1.4rem">${dealIcon}</span>
+              <div>
+                <div style="font-family:'DM Sans',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:.28em;color:#b89a60;text-transform:uppercase;margin-bottom:.1rem">${deal.badge}</div>
+                <div style="font-family:'DM Serif Display','Georgia',serif;font-size:1.25rem;color:#f5e8d0;line-height:1.1">${deal.tagline}</div>
+              </div>
+            </div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.62rem;color:rgba(245,232,208,.5);white-space:nowrap">${deal.sub}</div>
+          </div>
+          <!-- Savings note -->
+          <div style="background:#fdf8ef;padding:.6rem 1.1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid #e8dcc8">
+            <span style="color:#4a8a3a;font-size:.9rem">●</span>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.72rem;color:#5a4020">${deal.savings}</div>
+          </div>
+          <!-- CTA -->
+          <div style="background:#faf5ec;padding:.9rem 1.1rem;display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap">
+            <div style="font-family:'DM Sans',sans-serif;font-size:.65rem;color:#8a7050">via <strong style="color:#5a3800">${deal.provider}</strong></div>
+            <a href="${deal.url}" target="_blank" rel="noopener"
+               style="font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:#2a1600;color:#f5e8d0;padding:.65rem 1.3rem;text-decoration:none;border-radius:2px;white-space:nowrap;display:inline-flex;align-items:center;gap:.4rem;transition:background .2s;-webkit-tap-highlight-color:transparent;touch-action:manipulation;"
+               onmouseover="this.style.background='#1a0e00'" onmouseout="this.style.background='#2a1600'">
+              ${dealIcon} Claim This Getaway
+            </a>
+          </div>
+        </div>`;
+      document.getElementById('cmp-deal-block').style.display='block';
+
+      const res=document.getElementById('cmp-results');
+      res.style.maxHeight='2400px';
+      setTimeout(()=>{
+        document.getElementById('cmp-note-hero').scrollIntoView({behavior:'smooth',block:'start'});
+      },900);
+    }
+
+    window.cmpReset=function(){
+      const res=document.getElementById('cmp-results');
+      res.style.maxHeight='0';
+      document.querySelectorAll('.cmp-wkey,.cmp-bkey').forEach(k=>k.classList.remove('cmp-active'));
+      const deal=document.getElementById('cmp-deal-block');
+      if(deal){deal.style.display='none';deal.innerHTML='';}
+      const scroller=document.getElementById('cmp-scroll');
+      if(scroller)scroller.scrollTo({top:0,behavior:'smooth'});
+    };
+
+    // init after DOM paint so offsetWidth is real
+    if(document.readyState==='loading'){
+      document.addEventListener('DOMContentLoaded',()=>setTimeout(initMiniPiano,100));
+    } else {
+      setTimeout(initMiniPiano,100);
+    }
+  })();
+  </script>
 
   <!-- AI.PLACE APP SHOWCASE -->
   <div class="panel" id="p_aiplace"><div class="box"><div class="inner">
@@ -598,7 +1082,7 @@ const N=panels.length;
 const dotsEl=document.getElementById('dots');
 const pbar=document.getElementById('pbar');
 let cur=0;
-const LABELS=['Home','Ai.Place','About','Traits','Svcs 1','Svcs 2','Process','Bots','OTG','Skills','Contact'];
+const LABELS=['Home','Music Trip','Ai.Place','About','Traits','Svcs 1','Svcs 2','Process','Bots','OTG','Skills','Contact'];
 panels.forEach((_,i)=>{
   const d=document.createElement('button');
   d.className='dot'+(i===0?' on':'');
@@ -615,16 +1099,92 @@ const io=new IntersectionObserver(entries=>{
   });
 },{threshold:[0,.55],root:app});
 panels.forEach(p=>io.observe(p));
+function cmpAtBottom(){
+  const s=document.getElementById('cmp-scroll');
+  if(!s)return false;
+  return s.scrollTop+s.clientHeight>=s.scrollHeight-12;
+}
+function cmpAtTop(){
+  const s=document.getElementById('cmp-scroll');
+  if(!s)return false;
+  return s.scrollTop<=12;
+}
+
 let wlk=false;
-app.addEventListener('wheel',e=>{e.preventDefault();if(wlk)return;wlk=true;goTo(cur+(e.deltaX>0||e.deltaY>0?1:-1));setTimeout(()=>wlk=false,650);},{passive:false});
+app.addEventListener('wheel',e=>{
+  if(cur===1){
+    const isHoriz=Math.abs(e.deltaX)>Math.abs(e.deltaY);
+    if(isHoriz){
+      e.preventDefault();if(wlk)return;wlk=true;
+      goTo(cur+(e.deltaX>0?1:-1));setTimeout(()=>wlk=false,650);
+      return;
+    }
+    if(e.deltaY>0&&cmpAtBottom()){
+      e.preventDefault();if(wlk)return;wlk=true;
+      goTo(cur+1);setTimeout(()=>wlk=false,800);return;
+    }
+    if(e.deltaY<0&&cmpAtTop()){
+      e.preventDefault();if(wlk)return;wlk=true;
+      goTo(cur-1);setTimeout(()=>wlk=false,800);return;
+    }
+    return; // let native scroll handle it
+  }
+  e.preventDefault();if(wlk)return;wlk=true;
+  goTo(cur+(e.deltaX>0||e.deltaY>0?1:-1));setTimeout(()=>wlk=false,650);
+},{passive:false});
+
 window.addEventListener('keydown',e=>{
-  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();goTo(cur+1);}
-  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();goTo(cur-1);}
+  if(e.key==='ArrowRight'){e.preventDefault();goTo(cur+1);}
+  if(e.key==='ArrowLeft'){e.preventDefault();goTo(cur-1);}
+  if(e.key==='ArrowDown'){
+    if(cur===1&&!cmpAtBottom())return;
+    e.preventDefault();goTo(cur+1);
+  }
+  if(e.key==='ArrowUp'){
+    if(cur===1&&!cmpAtTop())return;
+    e.preventDefault();goTo(cur-1);
+  }
 });
-let tx0=0,ty0=0;
-app.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;},{passive:true});
+
+// Touch — track on the app container but only act on horizontal swipes on music panel
+let tx0=0,ty0=0,tScrolled=false;
+app.addEventListener('touchstart',e=>{
+  tx0=e.touches[0].clientX;
+  ty0=e.touches[0].clientY;
+  tScrolled=false;
+},{passive:true});
+
+// On music panel, allow cmp-scroll to handle vertical touch natively.
+// Only intercept if it's clearly horizontal OR at edge.
+app.addEventListener('touchmove',e=>{
+  if(cur!==1)return; // not music panel — don't interfere
+  const dx=Math.abs(e.touches[0].clientX-tx0);
+  const dy=Math.abs(e.touches[0].clientY-ty0);
+  if(dx>dy&&dx>8){
+    // Clearly horizontal — prevent to stop panel from scrolling sideways
+    e.preventDefault();
+  }
+  if(dy>dx)tScrolled=true; // user is scrolling vertically
+},{passive:false});
+
 app.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-tx0,dy=e.changedTouches[0].clientY-ty0;
+  const dx=e.changedTouches[0].clientX-tx0;
+  const dy=e.changedTouches[0].clientY-ty0;
+  if(cur===1){
+    // Horizontal swipe → navigate panels
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+      if(wlk)return;wlk=true;goTo(cur+(dx<0?1:-1));setTimeout(()=>wlk=false,800);return;
+    }
+    // Upward swipe at bottom → next panel
+    if(dy<-55&&cmpAtBottom()&&!tScrolled){
+      if(wlk)return;wlk=true;goTo(cur+1);setTimeout(()=>wlk=false,800);return;
+    }
+    // Downward swipe at top → prev panel
+    if(dy>55&&cmpAtTop()&&!tScrolled){
+      if(wlk)return;wlk=true;goTo(cur-1);setTimeout(()=>wlk=false,800);return;
+    }
+    return;
+  }
   if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40)goTo(cur+(dx<0?1:-1));
 },{passive:true});
 document.getElementById('subBtn').onclick=function(){this.textContent='✓ Sent';this.style.background='rgba(30,80,14,.8)';this.disabled=true;setTimeout(()=>{this.textContent='Send Message →';this.style.background='';this.disabled=false;},3000);};
