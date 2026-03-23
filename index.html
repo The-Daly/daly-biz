@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>DALY.BIZ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'DM Serif Display','Georgia',serif;background:#b89a60}
+.sans{font-family:'DM Sans',system-ui,sans-serif}
+#fc{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0}
+#app{position:relative;z-index:1;display:flex;width:100%;height:100vh;overflow-x:scroll;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#app::-webkit-scrollbar{display:none}
+.panel{min-width:100vw;height:100vh;scroll-snap-align:start;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding:4.5rem 2rem 3.5rem}
+.box{width:100%;max-width:860px;background:#faf5ec;border:1px solid #e8dcc8;border-radius:3px;box-shadow:0 8px 48px rgba(80,50,10,.15);overflow-y:auto;max-height:calc(100vh - 8rem);scrollbar-width:thin;scrollbar-color:#d4c4a8 transparent;transition:transform .7s cubic-bezier(.22,.8,.32,1),opacity .7s ease,filter .7s ease;transform:scale(1) translateZ(0);opacity:1;filter:blur(0px);will-change:transform,opacity,filter}
+.box.inactive{opacity:.6;transform:scale(.93) translateY(18px) translateZ(0);filter:blur(5px)}
+.box::-webkit-scrollbar{width:3px}
+.box::-webkit-scrollbar-thumb{background:#d4c4a8}
+.inner{padding:3rem 3.5rem}
+@media(max-width:600px){
+  .panel{padding:3.8rem .75rem 3rem}
+  .box{max-height:calc(100vh - 7rem);width:calc(100vw - 1.5rem)}
+  .inner{padding:1.6rem 1.4rem}
+  .hbody{max-width:100%!important;font-size:.92rem}
+  .stat-col{flex-direction:row!important;width:100%!important;max-width:100%!important}
+  .stat-col .si{flex:1;padding:.9rem .5rem!important;min-width:0!important}
+  .stat-col .sn{font-size:1.3rem!important}
+  .stat-col .sl{font-size:.52rem!important;letter-spacing:.08em!important}
+  .ttl{font-size:clamp(1.4rem,6vw,2rem)!important}
+  .steps{grid-template-columns:1fr!important}
+  .otg-grid{grid-template-columns:1fr!important}
+  .contact-grid{grid-template-columns:1fr!important}
+  .frow{grid-template-columns:1fr!important}
+  #p_bots .inner>div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  nav{padding:.75rem 1rem}
+  .nav-r a{display:none!important}
+  .dots{gap:.35rem;padding:.35rem .6rem}
+  .dot{width:6px;height:6px}
+}
+nav{position:fixed;top:0;left:0;right:0;z-index:50;padding:.85rem 2rem;display:flex;justify-content:space-between;align-items:center}
+.logo{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.14em;color:rgba(40,22,0,.85);cursor:pointer;white-space:nowrap}
+.nav-r{display:flex;gap:.3rem;align-items:center}
+.nav-r a{font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;letter-spacing:.07em;color:rgba(40,22,0,.62);text-decoration:none;padding:.3rem .65rem;cursor:pointer;transition:color .2s;display:none;white-space:nowrap}
+.nav-r a:hover{color:rgba(40,22,0,.95)}
+@media(min-width:640px){.nav-r a{display:inline}}
+.nav-cta{font-family:'DM Sans',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.08em;color:rgba(40,22,0,.85);border:1px solid rgba(40,22,0,.3);padding:.34rem .9rem;text-decoration:none;cursor:pointer;transition:all .2s;background:rgba(255,248,230,.55);white-space:nowrap}
+.nav-cta:hover{background:rgba(40,22,0,.12)}
+.dots{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%);z-index:50;display:flex;gap:.45rem;background:rgba(200,170,100,.45);padding:.38rem .7rem;border-radius:20px;border:1px solid rgba(255,255,255,.3)}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(40,22,0,.22);border:none;cursor:pointer;transition:all .25s}
+.dot.on{background:rgba(40,22,0,.75);transform:scale(1.35)}
+#pbar{position:fixed;bottom:0;left:0;height:2px;background:rgba(40,22,0,.4);z-index:60;pointer-events:none}
+.lbl{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.22em;color:rgba(40,22,0,.45);text-transform:uppercase;margin-bottom:.65rem}
+.ttl{font-family:'DM Serif Display','Georgia',serif;font-size:clamp(1.6rem,3.5vw,2.5rem);font-weight:400;line-height:1.2;color:#1a0e00}
+.ttl em{font-style:italic;color:#5a3800}
+.rule{width:36px;height:2px;background:rgba(40,22,0,.2);margin:.9rem 0 1.3rem}
+.bd{font-family:'DM Sans',sans-serif;font-size:clamp(.88rem,2vw,.96rem);font-weight:400;line-height:1.85;color:rgba(40,22,0,.68);margin-bottom:.85rem}
+.blk{padding:1.2rem 1.5rem;background:#fdf8ef;border:1px solid #e8dcc8;border-bottom:none;transition:background .2s}
+.blk:last-child{border-bottom:1px solid #e8dcc8}
+.blk:hover{background:#fffcf5}
+.bn{font-family:'DM Sans',sans-serif;font-size:.6rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.32rem}
+.bt{font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a0e00;margin-bottom:.3rem;letter-spacing:-.01em}
+.bb{font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:400;line-height:1.6;color:#5a4020}
+.btag{display:inline-block;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.1em;padding:.12rem .48rem;margin-top:.45rem;border:1px solid #c4a870;color:#7a5a20}
+.svc-row{display:flex;align-items:center;gap:1rem;padding:1rem 1.4rem;background:#fdf8ef;border-bottom:1px solid #e8dcc8;transition:background .2s;cursor:default}
+.svc-row:hover{background:#fffcf5}
+.svc-num{min-width:28px;font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.18em;color:#a08060}
+.btn-site{display:inline-block;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;background:#2a1600;color:#f5e8d0;padding:.78rem 2rem;font-size:.8rem;letter-spacing:.08em;text-decoration:none;border:none;transition:background .2s}
+.btn-site:hover{background:#1a0e00}
+.btn-o{display:inline-block;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;background:#f5f0e4;color:#1a0e00;padding:.72rem 1.7rem;font-size:.78rem;letter-spacing:.07em;text-decoration:none;border:1px solid #c4a870;transition:all .2s}
+.btn-o:hover{background:#ece5d0}
+.eyebrow{font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.22em;color:rgba(40,22,0,.42);text-transform:uppercase;margin-bottom:.9rem}
+.hbody{font-family:'DM Sans',sans-serif;font-weight:400;font-size:clamp(.88rem,2vw,.97rem);line-height:1.8;color:#5a4020;max-width:380px;margin-bottom:1.7rem}
+.stat-col{display:flex;flex-direction:column;gap:1px;background:#d4c4a8}
+.si{background:#f5f0e4;padding:1.1rem 1.5rem;min-width:110px;text-align:center}
+.sn{font-family:'DM Sans',sans-serif;font-weight:700;font-size:1.7rem;color:#1a0e00;letter-spacing:-.02em}
+.sl{font-family:'DM Sans',sans-serif;font-weight:500;font-size:.6rem;letter-spacing:.14em;color:#8a7050;margin-top:.12rem;text-transform:uppercase}
+.stack{display:flex;flex-direction:column;max-width:640px;margin-top:.8rem}
+.steps{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:#d4c4a8;border:1px solid #d4c4a8;margin-top:1.8rem}
+.step{padding:1.8rem 1.6rem;background:#fdf8ef;transition:background .2s}
+.step:hover{background:#fffcf5}
+.sn2{font-family:'DM Sans',sans-serif;font-weight:800;font-size:2rem;color:#d4c4a8;line-height:1;margin-bottom:.9rem;letter-spacing:-.03em}
+.step h3{font-family:'DM Sans',sans-serif;font-weight:700;font-size:.97rem;margin-bottom:.45rem;color:#1a0e00}
+.step p{font-family:'DM Sans',sans-serif;font-weight:400;font-size:.82rem;line-height:1.7;color:#5a4020}
+.otg-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+@media(max-width:560px){.otg-grid{grid-template-columns:1fr}}
+.pt h4{font-family:'DM Sans',sans-serif;font-weight:600;font-size:.62rem;letter-spacing:.2em;color:#8a7050;margin-bottom:1.1rem;text-transform:uppercase}
+.ptr{display:flex;justify-content:space-between;align-items:center;padding:.75rem 0;border-bottom:1px solid #e8dcc8;font-size:.87rem}
+.ptr:last-child{border-bottom:none}
+.ptr span:first-child{font-family:'DM Sans',sans-serif;font-weight:400;color:#5a4020}
+.pts{font-family:'DM Sans',sans-serif;font-weight:600;font-size:.64rem;letter-spacing:.1em;color:#2a6e1a}
+.pulse{width:6px;height:6px;background:#2a9e1a;border-radius:50%;display:inline-block;margin-right:.4rem;animation:glow 2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(42,158,26,.5)}50%{box-shadow:0 0 0 5px rgba(42,158,26,0)}}
+.pills{display:flex;flex-wrap:wrap;gap:.38rem;margin-top:1.4rem}
+.pill{font-family:'DM Sans',sans-serif;font-weight:500;background:#f5f0e4;border:1px solid #d4c4a8;padding:.36rem .9rem;font-size:.78rem;color:#5a4020;letter-spacing:.02em;transition:all .2s;cursor:default}
+.pill:hover{background:#ece5d0;color:#1a0e00}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+@media(max-width:560px){.contact-grid{grid-template-columns:1fr}}
+.cf{display:flex;flex-direction:column;gap:.65rem}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.65rem}
+.cf input,.cf select,.cf textarea{width:100%;background:#fff;border:1px solid #d4c4a8;padding:.74rem .9rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:400;color:#1a0e00;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.cf *::placeholder{color:#a08060}
+.cf *:focus{border-color:#8a6a30}
+.cf textarea{min-height:88px;resize:vertical}
+.cf select option{background:#fff}
+.subbtn{font-family:'DM Sans',sans-serif;font-weight:700;font-size:.84rem;letter-spacing:.08em;background:#2a1600;color:#f5e8d0;border:none;padding:.86rem;cursor:pointer;transition:background .2s;width:100%}
+.subbtn:hover{background:#1a0e00}
+.extl{font-family:'DM Sans',sans-serif;font-weight:500;display:block;margin-top:1.6rem;font-size:.74rem;letter-spacing:.08em;color:#7a5a30;text-decoration:none;border-bottom:1px solid #d4c4a8;padding-bottom:.34rem;transition:color .2s;max-width:280px}
+.extl:hover{color:#1a0e00}
+/* title canvas wrapper */
+#title-canvas{display:block;width:100%;height:auto;border-radius:2px;margin-bottom:1.2rem}
+</style>
+</head>
+<body>
+<canvas id="fc"></canvas>
+<div id="pbar"></div>
+<nav>
+  <div class="logo" onclick="goTo(0)">DALY.BIZ</div>
+  <div class="nav-r">
+    <a onclick="goTo(2)">About</a>
+    <a onclick="goTo(4)">Services</a>
+    <a onclick="goTo(6)">Process</a>
+    <a onclick="goTo(7)">Bots</a>
+    <a onclick="goTo(8)">OTG</a>
+    <a onclick="goTo(9)">Skills</a>
+    <a class="nav-cta" onclick="goTo(10)">Get Started</a>
+  </div>
+</nav>
+<div class="dots" id="dots"></div>
+<div id="app">
+
+  <!-- P0 HERO -->
+  <div class="panel" id="p0">
+    <div class="box"><div class="inner">
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center">
+        <p class="eyebrow">// Digital Consulting LLC</p>
+        <!-- animated title -->
+        <canvas id="title-canvas"></canvas>
+        <canvas id="title-off" style="display:none"></canvas>
+        <p class="hbody" style="max-width:420px;margin:0 auto 1.7rem">Discord ecosystems, Whop academies, executive ops, and creative production — built for founders, traders, and operators who move fast.</p>
+        <a class="btn-site" onclick="goTo(3)" style="margin-bottom:2rem">Explore Services →</a>
+        <div class="stat-col" style="flex-direction:row;width:100%;max-width:480px">
+          <div class="si" style="flex:1"><div class="sn">9+</div><div class="sl">Services</div></div>
+          <div style="width:1px;background:#d4c4a8"></div>
+          <div class="si" style="flex:1"><div class="sn">24H</div><div class="sl">Response</div></div>
+          <div style="width:1px;background:#d4c4a8"></div>
+          <div class="si" style="flex:1"><div class="sn">OTG</div><div class="sl">Partner</div></div>
+          <div style="width:1px;background:#d4c4a8"></div>
+          <div class="si" style="flex:1"><div class="sn">LLC</div><div class="sl">Verified</div></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- AI.PLACE APP SHOWCASE -->
+  <div class="panel" id="p_aiplace"><div class="box"><div class="inner">
+    <div class="lbl">Featured Project</div>
+    <h2 class="ttl">Ai.Place <em>Marketplace</em></h2>
+    <div class="rule"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start">
+
+      <div>
+        <p class="bd">Ai.Place is an AI App Marketplace — a platform where developers can build, submit, and monetize AI-powered applications, and users can browse, launch, and purchase them in one place.</p>
+        <p class="bd" style="opacity:.75">Built to support multiple pricing models including free, paid, and pay-what-you-want. Creators get their own profile and storefront. Users get a clean, searchable catalogue of AI tools ready to launch instantly.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.4rem">
+          <span class="btag">AI MARKETPLACE</span>
+          <span class="btag">WEB APP</span>
+          <span class="btag">MONETIZATION</span>
+          <span class="btag">CREATOR TOOLS</span>
+        </div>
+        <a href="https://ai-place.base44.app" target="_blank" class="btn-site" style="display:inline-block">Visit Ai.Place</a>
+      </div>
+
+      <div style="display:flex;flex-direction:column">
+        <div class="blk">
+          <div class="bn">For Users</div>
+          <div class="bt">Browse & Launch AI Apps</div>
+          <div class="bb">Discover a growing catalogue of AI-powered tools. Buy, try, or save apps — all from one clean interface.</div>
+        </div>
+        <div class="blk">
+          <div class="bn">For Creators</div>
+          <div class="bt">Build & Monetize</div>
+          <div class="bb">Submit your AI app, set your pricing, and get your own creator storefront. Free, paid, or pay-what-you-want.</div>
+        </div>
+        <div class="blk">
+          <div class="bn">Platform</div>
+          <div class="bt">AI Integrations Built In</div>
+          <div class="bb">Apps on the marketplace can leverage advanced AI models directly — enabling tools like MindMap GPT and more.</div>
+        </div>
+      </div>
+
+    </div>
+  </div></div></div>
+
+  <!-- P1 ABOUT -->
+  <div class="panel" id="p1">
+    <div class="box"><div class="inner">
+      <div class="lbl" style="text-align:center">About Daly.biz</div>
+      <h2 class="ttl" style="text-align:center">One consultant. <em>Full stack.</em></h2>
+      <div class="rule" style="margin-left:auto;margin-right:auto"></div>
+      <p class="bd" style="max-width:580px;text-align:center;margin-left:auto;margin-right:auto">Daly.biz is a consulting firm helping founders, traders, and digital-first businesses design, build, and operate the systems behind their ideas. From technical infrastructure to strategy and automation, Daly.biz provides hands-on execution without the overhead of a traditional agency.</p>
+    </div></div>
+  </div>
+
+  <!-- P2 TRAITS -->
+  <div class="panel" id="p2">
+    <div class="box"><div class="inner">
+      <div class="lbl">Core Traits</div>
+      <h2 class="ttl">What I bring <em>to the table</em></h2>
+      <div class="stack" style="margin-top:1.2rem">
+        <div class="blk"><div class="bn">Trait 01</div><div class="bt">Community Architect</div><div class="bb">Builds Discord servers and bot ecosystems from scratch — roles, flows, automation, and culture baked in from day one.</div></div>
+        <div class="blk"><div class="bn">Trait 02</div><div class="bt">Creative Producer</div><div class="bb">Adobe Premiere, After Effects, Illustrator — video edits, motion graphics, and custom SVG brand assets, all in-house.</div></div>
+        <div class="blk"><div class="bn">Trait 03</div><div class="bt">Ops &amp; Systems Thinker</div><div class="bb">Scheduling, SOPs, Whop commerce, and project management — keeps CEOs, CFOs, and founders running lean and on track.</div></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P3 SERVICES 1/2 -->
+  <div class="panel" id="p3">
+    <div class="box" style="max-height:calc(100vh - 8rem)"><div class="inner" style="padding-bottom:2rem">
+      <div class="lbl">What I Build — 1 of 2</div>
+      <h2 class="ttl" style="margin-bottom:1rem">End-to-end <em>digital services</em></h2>
+      <div style="display:flex;flex-direction:column;border:1px solid #e8dcc8;overflow:hidden">
+        <div class="svc-row"><div class="svc-num">01</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Discord Bot Development</div><div class="bb">Custom bots, commands, automation, moderation, and integrations. Full deployment included.</div></div><span class="btag" style="flex-shrink:0">CUSTOM</span></div>
+        <div class="svc-row"><div class="svc-num">02</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Discord Server Setup</div><div class="bb">Complete architecture — roles, channels, verification flows, ticketing, and bot ecosystems.</div></div><span class="btag" style="flex-shrink:0">CONFIG</span></div>
+        <div class="svc-row"><div class="svc-num">03</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Whop Stores &amp; Academies</div><div class="bb">Memberships, paywalled content, community access, and automated delivery — fully configured.</div></div><span class="btag" style="flex-shrink:0">COMMERCE</span></div>
+        <div class="svc-row"><div class="svc-num">04</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Executive Scheduling &amp; Ops</div><div class="bb">Time-blocking, calendar systems, and SOPs for CEOs and CFOs who need structured accountability.</div></div><span class="btag" style="flex-shrink:0">OPS</span></div>
+        <div class="svc-row" style="border-bottom:none"><div class="svc-num">05</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Video Editing — Adobe Suite</div><div class="bb">Premiere Pro &amp; After Effects — short-form, promos, course content, and motion graphics.</div></div><span class="btag" style="flex-shrink:0">ADOBE</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P4 SERVICES 2/2 -->
+  <div class="panel" id="p4">
+    <div class="box" style="max-height:calc(100vh - 8rem)"><div class="inner" style="padding-bottom:2rem">
+      <div class="lbl">What I Build — 2 of 2</div>
+      <h2 class="ttl" style="margin-bottom:1rem">End-to-end <em>digital services</em></h2>
+      <div style="display:flex;flex-direction:column;border:1px solid #e8dcc8;overflow:hidden">
+        <div class="svc-row"><div class="svc-num">06</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">SVG &amp; Graphic Design</div><div class="bb">Hand-crafted vector art, logos, icons, and brand assets. Scalable, production-ready files.</div></div><span class="btag" style="flex-shrink:0">DESIGN</span></div>
+        <div class="svc-row"><div class="svc-num">07</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Website Development &amp; Moderation</div><div class="bb">Front-end builds, landing pages, and ongoing site moderation — fast, accurate, on-brand.</div></div><span class="btag" style="flex-shrink:0">WEB</span></div>
+        <div class="svc-row"><div class="svc-num">08</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Project &amp; Task Management</div><div class="bb">Notion, Trello, or Asana setup with dashboards, automations, and workflows your team will use.</div></div><span class="btag" style="flex-shrink:0">PM</span></div>
+        <div class="svc-row" style="border-bottom:none"><div class="svc-num">09</div><div style="flex:1"><div class="bt" style="margin-bottom:.15rem">Social Media &amp; Copywriting</div><div class="bb">Content calendars, post copy, and launch assets consistent with your brand voice.</div></div><span class="btag" style="flex-shrink:0">GROWTH</span></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P5 PROCESS -->
+  <div class="panel" id="p5">
+    <div class="box"><div class="inner">
+      <div class="lbl">The Process</div>
+      <h2 class="ttl">Your project, <em>executed.</em></h2>
+      <div class="rule"></div>
+      <div class="steps">
+        <div class="step"><div class="sn2">01</div><h3>Discovery Call</h3><p>Align on goals, scope, and timeline. You explain the need — I map the path.</p></div>
+        <div class="step"><div class="sn2">02</div><h3>Scoped Proposal</h3><p>Clear deliverables and flat pricing. No surprises, no scope creep.</p></div>
+        <div class="step"><div class="sn2">03</div><h3>Build &amp; Execute</h3><p>Fast, focused delivery with direct communication throughout.</p></div>
+        <div class="step"><div class="sn2">04</div><h3>Delivery &amp; Handoff</h3><p>Final delivery with docs, training if needed, and optional ongoing support.</p></div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P6 BOTS -->
+  <div class="panel" id="p_bots">
+    <div class="box"><div class="inner">
+      <div class="lbl">Live Builds</div>
+      <h2 class="ttl">Discord bots <em>in the wild</em></h2>
+      <div class="rule"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:.5rem">
+        <div style="display:flex;flex-direction:column;border:1px solid #e8dcc8;background:#fdf8ef;padding:2rem 1.8rem;gap:1rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div style="width:38px;height:38px;background:#f0e8d8;border:1px solid #e8dcc8;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">🎲</div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.2rem">Game Bot</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a0e00;line-height:1">Spice &amp; Dice</div>
+            </div>
+          </div>
+          <p style="font-family:'DM Sans',sans-serif;font-size:.83rem;line-height:1.65;color:#5a4020;flex:1">A fun, interactive Discord game bot that brings your community to life. Roll the dice, take your chances, and let the spice decide — designed to drive engagement and keep members coming back.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+            <span class="btag">GAME</span><span class="btag">ENGAGEMENT</span><span class="btag">COMMUNITY</span>
+          </div>
+          <a href="https://discord.com/oauth2/authorize?client_id=1482212987988213911" target="_blank" class="btn-site" style="display:block;text-align:center">Add to Discord →</a>
+        </div>
+        <div style="display:flex;flex-direction:column;border:1px solid #e8dcc8;background:#fdf8ef;padding:2rem 1.8rem;gap:1rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <div style="width:38px;height:38px;background:#f0e8d8;border:1px solid #e8dcc8;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0">📈</div>
+            <div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.2rem">Trading Bot</div>
+              <div style="font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;color:#1a0e00;line-height:1">OTG Trading Bot</div>
+            </div>
+          </div>
+          <p style="font-family:'DM Sans',sans-serif;font-size:.83rem;line-height:1.65;color:#5a4020;flex:1">The official bot of OTG Trading Academy. Built to support traders with structured commands, rank verification, academy navigation, and community management — fully integrated with the OTG ecosystem.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:.4rem">
+            <span class="btag">TRADING</span><span class="btag">AUTOMATION</span><span class="btag">OTG</span>
+          </div>
+          <a href="https://discord.com/oauth2/authorize?client_id=1482490980698689577" target="_blank" class="btn-site" style="display:block;text-align:center">Add to Discord →</a>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P7 OTG -->
+  <div class="panel" id="p6">
+    <div class="box"><div class="inner">
+      <div class="lbl"><span class="pulse"></span>Official Partner</div>
+      <h2 class="ttl">OTG Trading <em>Academy</em></h2>
+      <div class="rule"></div>
+      <div class="otg-grid">
+        <div>
+          <p class="bd" style="margin-bottom:1.6rem">Daly.biz is the infrastructure partner behind OTG Trading Academy — Discord architecture, bot automation, Whop management, and community operations for one of the most structured trading academies online.</p>
+          <a href="https://otg-academy-landing-page.netlify.app/" target="_blank" class="btn-o">Visit OTG Academy →</a>
+        </div>
+        <div class="pt">
+          <h4>Services Provided to OTG</h4>
+          <div class="ptr"><span>Discord Architecture</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Bot Development</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Whop Management</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Community Moderation</span><span class="pts">ACTIVE</span></div>
+          <div class="ptr"><span>Website Infrastructure</span><span class="pts">ACTIVE</span></div>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P8 SKILLS -->
+  <div class="panel" id="p7">
+    <div class="box"><div class="inner">
+      <div class="lbl">Full Toolkit</div>
+      <h2 class="ttl">Skills <em>&amp;</em> Tools</h2>
+      <div class="rule"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#e8dcc8;border:1px solid #e8dcc8;margin-top:.5rem">
+
+        <div style="background:#fdf8ef;padding:1.2rem 1.4rem">
+          <div style="font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.8rem">Community</div>
+          <div style="display:flex;flex-direction:column;gap:.45rem">
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Discord.js</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Bot Hosting &amp; Deployment</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Whop Platform</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Community Moderation</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Role &amp; Permission Design</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Onboarding Flows</div>
+          </div>
+        </div>
+
+        <div style="background:#fdf8ef;padding:1.2rem 1.4rem">
+          <div style="font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.8rem">Creative</div>
+          <div style="display:flex;flex-direction:column;gap:.45rem">
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Adobe Premiere Pro</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Adobe After Effects</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Adobe Illustrator</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Custom SVG Design</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Short-form Video</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Brand Copywriting</div>
+          </div>
+        </div>
+
+        <div style="background:#fdf8ef;padding:1.2rem 1.4rem">
+          <div style="font-family:'DM Sans',sans-serif;font-size:.58rem;font-weight:600;letter-spacing:.2em;color:#a08060;text-transform:uppercase;margin-bottom:.8rem">Operations</div>
+          <div style="display:flex;flex-direction:column;gap:.45rem">
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">HTML / CSS / JavaScript</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Site Moderation</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Notion Workspaces</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Google Calendar</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Executive Scheduling</div>
+            <div style="font-family:'DM Sans',sans-serif;font-size:.82rem;color:#5a4020">Workflow Automation</div>
+          </div>
+        </div>
+
+      </div>
+    </div></div>
+  </div>
+
+  <!-- P9 CONTACT -->
+  <div class="panel" id="p8">
+    <div class="box"><div class="inner">
+      <div class="lbl">Let's Work</div>
+      <h2 class="ttl">Start a <em>project</em></h2>
+      <div class="rule"></div>
+      <div class="contact-grid">
+        <div>
+          <p class="bd">Tell me what you're building. I'll respond within 24 hours with clear scope and flat pricing.</p>
+          <p class="bd" style="opacity:.6">No commitment required for the first call.</p>
+          <a href="https://otg-academy-landing-page.netlify.app/" target="_blank" class="extl">OTG Trading Academy Partner ↗</a>
+          <p style="margin-top:2rem;font-size:.63rem;letter-spacing:.08em;color:#a08060;font-family:'DM Sans',sans-serif">© 2025 DALY.BIZ LLC</p>
+        </div>
+        <div class="cf">
+          <div class="frow">
+            <input type="text" placeholder="Your name">
+            <input type="email" placeholder="Email">
+          </div>
+          <select>
+            <option value="" disabled selected>Service needed…</option>
+            <option>Discord Bot / Server Setup</option>
+            <option>Whop Store or Academy</option>
+            <option>Executive Scheduling &amp; Ops</option>
+            <option>Video Editing (Adobe)</option>
+            <option>SVG / Graphic Design</option>
+            <option>Website Development</option>
+            <option>Trading Community Setup</option>
+            <option>Something else</option>
+          </select>
+          <textarea placeholder="Brief project description…"></textarea>
+          <button class="subbtn" id="subBtn">Send Message →</button>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DALY.BIZ TITLE ANIMATION
+// ═══════════════════════════════════════════
+(function initTitle(){
+  const tc = document.getElementById('title-canvas');
+  const to = document.getElementById('title-off');
+  if(!tc||!to) return;
+  const tctx = tc.getContext('2d');
+
+  const W = 720, H = 320;
+  tc.width=W; tc.height=H;
+  tc.style.height = Math.round(H * (tc.offsetWidth||W) / W) + 'px';
+
+  const GAP=10, BAR_W=4, NUM=Math.floor(W/GAP);
+
+  // rasterise DALY.BIZ
+  to.width=W; to.height=H;
+  const oc=to.getContext('2d');
+  oc.fillStyle='#fff'; oc.fillRect(0,0,W,H);
+  oc.fillStyle='#000'; oc.textAlign='center'; oc.textBaseline='middle';
+  let fs=140;
+  oc.font=`900 ${fs}px Arial Black,Arial,sans-serif`;
+  const tw=oc.measureText('DALY.BIZ').width;
+  if(tw>W*0.88) fs=Math.floor(fs*W*0.88/tw);
+  oc.font=`900 ${fs}px Arial Black,Arial,sans-serif`;
+  oc.fillText('DALY.BIZ',W/2,H/2);
+  const px=oc.getImageData(0,0,W,H).data;
+
+  const mask=[];
+  for(let i=0;i<NUM;i++){
+    const x=Math.round(i*GAP+GAP/2);
+    let top=-1,segs=[];
+    for(let y=0;y<H;y++){
+      const idx=(y*W+x)*4, filled=px[idx]<100;
+      if(filled&&top<0) top=y;
+      if(!filled&&top>=0){segs.push({top,bot:y-1});top=-1;}
+    }
+    if(top>=0) segs.push({top,bot:H-1});
+    mask.push(segs);
+  }
+
+  const cols=Array.from({length:NUM},(_,i)=>({
+    x:i*GAP+GAP/2,
+    bars:Array.from({length:4},(_,s)=>({
+      cy:(s+0.5)*(H/4)+(Math.random()-.5)*20,
+      h:10+Math.random()*30,
+      phase:Math.random()*Math.PI*2,
+      spd:0.3+Math.random()*0.5,
+    })),
+  }));
+
+  function wv(x,t){return Math.sin(x*.022+t)*Math.cos(x*.013-t*.7)+Math.sin(x*.041+t*1.2)*.3;}
+  function ease(x){return x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;}
+  function lp(a,b,t){return a+(b-a)*t;}
+
+  // dispersed = soft red, forming = transitions, formed = soft green
+  function barCol(ef){
+    const r=Math.round(200+(60-200)*ef);
+    const g=Math.round(80+(160-80)*ef);
+    const b=Math.round(80+(80-80)*ef);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  let t=0,morph=0,dir=1,holdCt=0,raf;
+  function frame(){
+    t+=0.011;
+    if(dir===1){
+      morph=Math.min(1,morph+0.004);
+      if(morph>=1){holdCt++;if(holdCt>280){holdCt=0;dir=-1;}}
+    } else {
+      morph=Math.max(0,morph-0.004);
+      if(morph<=0){holdCt++;if(holdCt>160){holdCt=0;dir=1;}}
+    }
+    const ef=ease(morph);
+
+    tctx.fillStyle='#faf5ec';
+    tctx.fillRect(0,0,W,H);
+
+    for(let i=0;i<NUM;i++){
+      const col=cols[i], msegs=mask[i], cx=col.x;
+      tctx.strokeStyle='#e0d8c8'; tctx.lineWidth=1;
+      tctx.beginPath(); tctx.moveTo(cx,0); tctx.lineTo(cx,H); tctx.stroke();
+      tctx.fillStyle=barCol(ef);
+      if(msegs.length===0){
+        for(let s=0;s<col.bars.length;s++){
+          const bar=col.bars[s];
+          const drift=wv(i+s*13,t*bar.spd+bar.phase)*22;
+          const cy=(s+0.5)*(H/col.bars.length)+drift;
+          const h=(10+(wv(i*1.4+s*9,t*bar.spd+1+bar.phase)*.5+.5)*28)*(1-ef*.85);
+          if(h>.5) tctx.fillRect(cx-BAR_W/2,cy-h/2,BAR_W,h);
+        }
+      } else {
+        const tCount=msegs.length,bCount=col.bars.length,n=Math.max(tCount,bCount);
+        for(let s=0;s<n;s++){
+          const bar=col.bars[s%bCount],ms=msegs[s%tCount];
+          const aDrift=wv(i+s*13,t*bar.spd+bar.phase)*22;
+          const aCY=(s%bCount+0.5)*(H/bCount)+aDrift;
+          const aH=10+(wv(i*1.4+(s%bCount)*9,t*bar.spd+1+bar.phase)*.5+.5)*28;
+          const tCY=(ms.top+ms.bot)/2;
+          const tH=ms.bot-ms.top;
+          const breathe=Math.sin(t*bar.spd*.9+bar.phase)*2.5;
+          const cy=lp(aCY,tCY+breathe*(1-ef*.6),ef);
+          const h=lp(aH,tH,ef);
+          if(h>.5) tctx.fillRect(cx-BAR_W/2,cy-h/2,BAR_W,h);
+        }
+      }
+    }
+    raf=requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ═══════════════════════════════════════════
+//  FRACTAL BACKGROUND
+// ═══════════════════════════════════════════
+const fc=document.getElementById('fc');
+const ctx=fc.getContext('2d');
+let W,H,oW,oH,ofc,ox,buf;
+function resize(){
+  W=fc.width=window.innerWidth; H=fc.height=window.innerHeight;
+  oW=Math.max(2,W*.35|0); oH=Math.max(2,H*.35|0);
+  ofc=document.createElement('canvas'); ofc.width=oW; ofc.height=oH;
+  ox=ofc.getContext('2d'); buf=ox.createImageData(oW,oH);
+}
+resize(); window.addEventListener('resize',resize);
+
+const PARAMS=[
+  {cx:-.7269,cy:.1889,z:2.8},{cx:-.4,cy:.6,z:2.6},
+  {cx:-.8,cy:.156,z:2.5},{cx:.285,cy:.01,z:2.7},
+  {cx:-.7,cy:.27,z:2.5},{cx:-.1011,cy:.633,z:2.6},
+  {cx:-.5251,cy:.5243,z:2.5},{cx:.3,cy:.5,z:2.6},
+  {cx:-.7269,cy:-.1889,z:2.8},{cx:-.4,cy:.6,z:2.6},
+];
+function lerp(a,b,t){return a+(b-a)*t;}
+const MAX=80;
+function julia(zx,zy,cx,cy){
+  let x=zx,y=zy,x2=x*x,y2=y*y,i=0;
+  while(x2+y2<=4&&i<MAX){y=2*x*y+cy;x=x2-y2+cx;x2=x*x;y2=y*y;i++;}
+  if(i===MAX) return MAX;
+  return i+1-Math.log2(Math.log2(Math.sqrt(x2+y2)+1e-10));
+}
+function tanColor(n){
+  if(n>=MAX) return[38,22,8];
+  const t=Math.min(n/MAX,1),h=(20+t*28)/360,s=.22+t*.28,l=.94-t*.60;
+  return hsl(h,s,l);
+}
+function hsl(h,s,l){
+  if(!s){const v=l*255|0;return[v,v,v];}
+  const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q,
+    hh=t=>{t=((t%1)+1)%1;return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p};
+  return[hh(h+1/3)*255|0,hh(h)*255|0,hh(h-1/3)*255|0];
+}
+let sFrac=0,tFrac=0,wobble=0,frameCount=0,rendering=false;
+function renderFrame(){
+  if(rendering)return; rendering=true;
+  const pos=Math.max(0,Math.min(sFrac*(PARAMS.length-1),PARAMS.length-1.001));
+  const idx=pos|0,frac=pos-idx;
+  const pa=PARAMS[idx],pb=PARAMS[Math.min(idx+1,PARAMS.length-1)];
+  const jcx=lerp(pa.cx,pb.cx,frac)+Math.sin(wobble*.8)*.003;
+  const jcy=lerp(pa.cy,pb.cy,frac)+Math.cos(wobble*.6)*.002;
+  const zoom=pa.z*Math.pow(pb.z/pa.z,frac),asp=oW/oH,d=buf.data;
+  for(let py=0;py<oH;py++){
+    for(let px=0;px<oW;px++){
+      const zx=(px/oW-.5)*zoom*asp*2,zy=(py/oH-.5)*zoom*2;
+      const n=julia(zx,zy,jcx,jcy),[r,g,b]=tanColor(n),i=(py*oW+px)*4;
+      d[i]=r;d[i+1]=g;d[i+2]=b;d[i+3]=255;
+    }
+  }
+  ox.putImageData(buf,0,0);
+  ctx.save();ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.clearRect(0,0,W,H);ctx.drawImage(ofc,0,0,W,H);
+  const vg=ctx.createRadialGradient(W/2,H/2,H*.05,W/2,H/2,H*.9);
+  vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(30,15,2,.38)');
+  ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);ctx.restore();
+  rendering=false;
+}
+function scheduleRender(){'requestIdleCallback'in window?requestIdleCallback(()=>renderFrame(),{timeout:80}):setTimeout(renderFrame,16);}
+function loop(){sFrac+=(tFrac-sFrac)*.006;wobble+=.004;frameCount++;if(frameCount%3===0)scheduleRender();requestAnimationFrame(loop);}
+
+// ═══════════════════════════════════════════
+//  PANEL NAVIGATION
+// ═══════════════════════════════════════════
+const app=document.getElementById('app');
+const panels=[...document.querySelectorAll('.panel')];
+const N=panels.length;
+const dotsEl=document.getElementById('dots');
+const pbar=document.getElementById('pbar');
+let cur=0;
+const LABELS=['Home','Ai.Place','About','Traits','Svcs 1','Svcs 2','Process','Bots','OTG','Skills','Contact'];
+panels.forEach((_,i)=>{
+  const d=document.createElement('button');
+  d.className='dot'+(i===0?' on':'');
+  d.title=LABELS[i]||''; d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+});
+function goTo(i){if(i<0||i>=N)return;panels[i].scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});updateUI(i);}
+function updateUI(i){cur=i;[...dotsEl.querySelectorAll('.dot')].forEach((d,j)=>d.classList.toggle('on',j===i));pbar.style.width=((i/(N-1))*100)+'%';tFrac=i/(N-1);}
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    const box=e.target.querySelector('.box');
+    if(e.intersectionRatio>.55){const i=panels.indexOf(e.target);if(i!==-1)updateUI(i);if(box)box.classList.remove('inactive');}
+    else{if(box)box.classList.add('inactive');}
+  });
+},{threshold:[0,.55],root:app});
+panels.forEach(p=>io.observe(p));
+let wlk=false;
+app.addEventListener('wheel',e=>{e.preventDefault();if(wlk)return;wlk=true;goTo(cur+(e.deltaX>0||e.deltaY>0?1:-1));setTimeout(()=>wlk=false,650);},{passive:false});
+window.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();goTo(cur+1);}
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();goTo(cur-1);}
+});
+let tx0=0,ty0=0;
+app.addEventListener('touchstart',e=>{tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;},{passive:true});
+app.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-tx0,dy=e.changedTouches[0].clientY-ty0;
+  if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40)goTo(cur+(dx<0?1:-1));
+},{passive:true});
+document.getElementById('subBtn').onclick=function(){this.textContent='✓ Sent';this.style.background='rgba(30,80,14,.8)';this.disabled=true;setTimeout(()=>{this.textContent='Send Message →';this.style.background='';this.disabled=false;},3000);};
+resize();renderFrame();loop();
+</script>
+</body>
+</html>
